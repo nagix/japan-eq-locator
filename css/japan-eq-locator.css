@@ -3,3 +3,20 @@ html, body {
 	height: 100%;
 	margin: 0;
 }
+.tooltip {
+	color: rgb(255, 255, 255);
+	background-color: rgba(0, 0, 0, 0.7);
+	position: absolute;
+	padding: 4px;
+	pointer-events: none;
+}
+.focused-point {
+	position: absolute;
+	transform: translate(-50%, -50%);
+	padding: 10px;
+	border-radius: 10px;
+	pointer-events: none;
+}
+.hidden {
+	display: none;
+}

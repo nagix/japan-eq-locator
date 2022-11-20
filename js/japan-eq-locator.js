@@ -9,6 +9,18 @@ const map = new mapboxgl.Map({
     pitch: 60
 });
 
+const focusedPoint = document.createElement('div');
+Object.assign(focusedPoint, {
+    className: 'focused-point hidden'
+});
+document.getElementById('map').appendChild(focusedPoint);
+
+const tooltip = document.createElement('div');
+Object.assign(tooltip, {
+    className: 'tooltip hidden'
+});
+document.getElementById('map').appendChild(tooltip);
+
 Promise.all([
     fetch('data/epicenters.json').then(res => res.json()),
     new Promise(resolve => {
@@ -29,6 +41,31 @@ Promise.all([
             const [rgb, r, g, b] = colorScale(d.position[2]).match(/(\d+), (\d+), (\d+)/);
             return [+r, +g, +b];
         },
-        getRadius: 500
+        getRadius: 500,
+        onHover: (info, e) => {
+            if (info.layer && info.layer.id === 'epicenters') {
+                if (info.object) {
+                    focusedPoint.style.left = info.x + 'px';
+                    focusedPoint.style.top = info.y + 'px';
+                    focusedPoint.style.backgroundColor = colorScale(info.object.position[2]);
+                    focusedPoint.classList.remove('hidden');
+
+                    tooltip.style.left = info.x + 4 + 'px';
+                    tooltip.style.top = info.y + 4 + 'px';
+                    tooltip.innerHTML = -info.object.position[2] / 1000 + 'km'
+                    tooltip.classList.remove('hidden');
+                } else {
+                    focusedPoint.classList.add('hidden');
+                    tooltip.classList.add('hidden');
+                }
+                return true;
+            }
+        }
     }));
+    map.on('move', () => {
+        focusedPoint.classList.add('hidden');
+        tooltip.classList.add('hidden');
+    });
+    // Workaround for deck.gl #3522
+    map.__deck.props.getCursor = () => map.getCanvas().style.cursor;
 });
