@@ -1,6 +1,6 @@
 # Japan EQ Locator
 
-An earthquake epicenter map of Japan.
+An earthquake hypocenter map of Japan.
 
 ![Screenshot](https://nagix.github.io/japan-eq-locator/screenshot1.jpg)
 
@@ -10,7 +10,7 @@ See a [Live Demo](https://nagix.github.io/japan-eq-locator).
 
 ## About Data (データについて)
 
-The data for this visualization are sourced from the [epicenter data](https://www.data.jma.go.jp/eqev/data/bulletin/index.html) by Japan Meteorological Agency.
+The data for this visualization are sourced from the [hypocenter data](https://www.data.jma.go.jp/eqev/data/bulletin/index.html) by Japan Meteorological Agency.
 
 このビジュアライゼーションは、気象庁の[震源データ](https://www.data.jma.go.jp/eqev/data/bulletin/index.html)を利用しています。
 
