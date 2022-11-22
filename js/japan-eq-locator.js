@@ -6,7 +6,7 @@ const colorScale = d3.scaleSequential([0, -500000], d3.interpolateSpectral);
 const map = new mapboxgl.Map({
     accessToken: 'pk.eyJ1IjoibmFnaXgiLCJhIjoiY2xhcDc4MXYyMGZxOTN5bWt4NHU4azJlbCJ9.BvJ83DIBKKtMgTsDHTZekw',
     container: 'map',
-    style: deck.carto.BASEMAP.DARK_MATTER_NOLABELS,
+    style: 'data/style.json',
     center: [139.7670, 35.6814],
     zoom: 7,
     pitch: 60
@@ -104,7 +104,7 @@ Promise.all([
                 return true;
             }
         }
-    }));
+    }), 'waterway');
     map.on('move', () => {
         hypocenterCircle.setAttributeNS(null, 'visibility', 'hidden');
         leader.setAttributeNS(null, 'visibility', 'hidden');
