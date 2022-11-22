@@ -18,8 +18,8 @@ document.getElementById('map').appendChild(svg);
 
 const defs = document.createElementNS(SVGNS, 'defs');
 defs.innerHTML =
-    '<filter id="hypocenter-filter" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" /></filter>' +
-    '<filter id="epicenter-filter" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="20" /></filter>';
+    '<filter id="hypocenter-filter" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5" /></filter>' +
+    '<filter id="epicenter-filter" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="20" /></filter>';
 svg.appendChild(defs);
 
 const hypocenterCircle = document.createElementNS(SVGNS, 'circle');
