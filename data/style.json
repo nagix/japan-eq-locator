@@ -1773,12 +1773,7 @@
             [12, 11]
           ]
         },
-        "line-opacity": {
-          "stops": [
-            [3, 0],
-            [4, 0.75]
-          ]
-        },
+        "line-opacity": 0.75,
         "line-blur": {
           "stops": [
             [3, 0],
@@ -1793,7 +1788,6 @@
       "source": "osm",
       "source-layer": "boundary",
       "filter": ["all", ["==", "admin_level", 4], ["==", "maritime", 0]],
-      "layout": { "visibility": "visible" },
       "paint": {
         "line-color": "hsla(0, 0%, 0%, 0.54)",
         "line-width": {
@@ -1822,10 +1816,7 @@
       "source": "osm",
       "source-layer": "water",
       "filter": ["any", ["==", "class", "ocean"], ["==", "class", "lake"]],
-      "layout": {
-          "line-join": "round",
-          "line-cap": "round"
-      },
+      "layout": { "line-join": "round", "line-cap": "round" },
       "paint": {
         "line-color": "hsla(0, 0%, 100%, 0.54)",
         "line-width": {
@@ -1842,6 +1833,7 @@
       "source": "osm",
       "source-layer": "boundary",
       "filter": ["all", ["==", "admin_level", 4], ["==", "maritime", 0]],
+      "layout": { "line-join": "round" },
       "paint": {
         "line-color": "hsla(0, 0%, 100%, 0.54)",
         "line-width": {
@@ -1854,12 +1846,20 @@
         "line-opacity": {
           "stops": [
             [3, 0],
-            [4, 0.75]
+            [4, 1]
           ]
         }
       }
     }
   ],
+"fog": {
+    "range": [1, 20],
+    "color": "#222227",
+    "horizon-blend": 0.5,
+    "high-color": "rgba(0, 0, 0, 0)",
+    "space-color": "#000",
+    "star-intensity": 0.15
+  },
   "id": "voyager",
   "owner": "Carto"
 }
