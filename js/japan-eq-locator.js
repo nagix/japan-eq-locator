@@ -28,6 +28,7 @@ const map = new mapboxgl.Map({
     zoom: auto ? 4 : 7,
     pitch: auto ? 0 : 60
 });
+let loaded = false;
 
 const svg = document.createElementNS(SVGNS, 'svg');
 svg.setAttributeNS(null, 'class', 'svg');
@@ -87,6 +88,9 @@ Promise.all([
     fetch('data/hypocenters.json').then(res => res.json()),
     new Promise(resolve => {
         map.once('styledata', resolve);
+        map.once('load', () => {
+            loaded = true;
+        });
     })
 ]).then(([data]) => {
     map.addLayer(new deck.MapboxLayer({
@@ -188,7 +192,7 @@ Promise.all([
             '</div>' +
             '</div>'
 
-        map.on('load', () => {
+        map.once(loaded ? 'idle' : 'load', () => {
             const width = document.getElementById('map').clientWidth;
             map.flyTo({
                 center: [+options.lng, +options.lat],
