@@ -3,6 +3,10 @@
   "name": "Dark Matter",
   "metadata": { "maputnik:renderer": "mbgljs" },
   "sources": {
+    "carto": {
+      "type": "vector",
+      "url": "https://tiles.basemaps.cartocdn.com/vector/carto.streets/v1/tiles.json"
+    },
     "osm": {
       "type": "vector",
       "url": "https://tile.openstreetmap.jp/data/planet.json"
@@ -20,7 +24,7 @@
     {
       "id": "landcover",
       "type": "fill",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "landcover",
       "filter": [
         "any",
@@ -44,7 +48,7 @@
     {
       "id": "park_national_park",
       "type": "fill",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "park",
       "minzoom": 9,
       "filter": ["all", ["==", "class", "national_park"]],
@@ -66,7 +70,7 @@
     {
       "id": "park_nature_reserve",
       "type": "fill",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "park",
       "minzoom": 0,
       "filter": ["all", ["==", "class", "nature_reserve"]],
@@ -93,7 +97,7 @@
     {
       "id": "landuse_residential",
       "type": "fill",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "landuse",
       "minzoom": 6,
       "filter": ["any", ["==", "class", "residential"]],
@@ -120,7 +124,7 @@
     {
       "id": "landuse",
       "type": "fill",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "landuse",
       "filter": ["any", ["==", "class", "cemetery"], ["==", "class", "stadium"]],
       "paint": {
@@ -138,7 +142,7 @@
     {
       "id": "water",
       "type": "fill",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "water",
       "minzoom": 0,
       "maxzoom": 24,
@@ -154,7 +158,7 @@
     {
       "id": "water_shadow",
       "type": "fill",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "water",
       "minzoom": 0,
       "filter": ["all", ["==", "$type", "Polygon"]],
@@ -177,7 +181,7 @@
     {
       "id": "waterway",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "waterway",
       "paint": {
         "line-color": "rgba(63, 90, 109, 1)",
@@ -194,7 +198,7 @@
     {
       "id": "boundary_county",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "boundary",
       "minzoom": 9,
       "maxzoom": 24,
@@ -224,7 +228,7 @@
     {
       "id": "boundary_state",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "boundary",
       "minzoom": 4,
       "filter": ["all", ["==", "admin_level", 4], ["==", "maritime", 0]],
@@ -256,7 +260,7 @@
     {
       "id": "aeroway-runway",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "aeroway",
       "minzoom": 12,
       "filter": ["all", ["==", "class", "runway"]],
@@ -277,7 +281,7 @@
     {
       "id": "aeroway-taxiway",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "aeroway",
       "minzoom": 13,
       "filter": ["all", ["==", "class", "taxiway"]],
@@ -296,7 +300,7 @@
     {
       "id": "tunnel_service_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -318,7 +322,7 @@
     {
       "id": "tunnel_minor_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 13,
       "maxzoom": 24,
@@ -343,7 +347,7 @@
     {
       "id": "tunnel_sec_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 11,
       "maxzoom": 24,
@@ -369,7 +373,7 @@
     {
       "id": "tunnel_pri_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 8,
       "maxzoom": 24,
@@ -402,7 +406,7 @@
     {
       "id": "tunnel_trunk_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 5,
       "maxzoom": 24,
@@ -439,7 +443,7 @@
     {
       "id": "tunnel_mot_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 5,
       "maxzoom": 24,
@@ -478,7 +482,7 @@
     {
       "id": "tunnel_path",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -505,7 +509,7 @@
     {
       "id": "tunnel_service_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -527,7 +531,7 @@
     {
       "id": "tunnel_minor_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -549,7 +553,7 @@
     {
       "id": "tunnel_sec_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 13,
       "maxzoom": 24,
@@ -574,7 +578,7 @@
     {
       "id": "tunnel_pri_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 11,
       "maxzoom": 24,
@@ -599,7 +603,7 @@
     {
       "id": "tunnel_trunk_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 11,
       "maxzoom": 24,
@@ -628,7 +632,7 @@
     {
       "id": "tunnel_mot_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 10,
       "maxzoom": 24,
@@ -659,7 +663,7 @@
     {
       "id": "tunnel_rail",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 13,
       "filter": ["all", ["==", "class", "rail"], ["==", "brunnel", "tunnel"]],
@@ -682,7 +686,7 @@
     {
       "id": "tunnel_rail_dash",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "filter": ["all", ["==", "class", "rail"], ["==", "brunnel", "tunnel"]],
@@ -709,7 +713,7 @@
     {
       "id": "road_service_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -731,7 +735,7 @@
     {
       "id": "road_minor_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 13,
       "maxzoom": 24,
@@ -762,7 +766,7 @@
     {
       "id": "road_pri_case_ramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 12,
       "maxzoom": 24,
@@ -791,7 +795,7 @@
     {
       "id": "road_trunk_case_ramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 12,
       "maxzoom": 24,
@@ -820,7 +824,7 @@
     {
       "id": "road_mot_case_ramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 12,
       "maxzoom": 24,
@@ -849,7 +853,7 @@
     {
       "id": "road_sec_case_noramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 11,
       "maxzoom": 24,
@@ -881,7 +885,7 @@
     {
       "id": "road_pri_case_noramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 7,
       "maxzoom": 24,
@@ -919,7 +923,7 @@
     {
       "id": "road_trunk_case_noramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 5,
       "maxzoom": 24,
@@ -957,7 +961,7 @@
     {
       "id": "road_mot_case_noramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 5,
       "maxzoom": 24,
@@ -996,7 +1000,7 @@
     {
       "id": "road_path",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -1023,7 +1027,7 @@
     {
       "id": "road_service_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -1045,7 +1049,7 @@
     {
       "id": "road_minor_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -1067,7 +1071,7 @@
     {
       "id": "road_pri_fill_ramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 12,
       "maxzoom": 24,
@@ -1091,7 +1095,7 @@
     {
       "id": "road_trunk_fill_ramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 12,
       "maxzoom": 24,
@@ -1115,7 +1119,7 @@
     {
       "id": "road_mot_fill_ramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 12,
       "maxzoom": 24,
@@ -1139,7 +1143,7 @@
     {
       "id": "road_sec_fill_noramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 13,
       "maxzoom": 24,
@@ -1164,7 +1168,7 @@
     {
       "id": "road_pri_fill_noramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 10,
       "maxzoom": 24,
@@ -1189,7 +1193,7 @@
     {
       "id": "road_trunk_fill_noramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 10,
       "maxzoom": 24,
@@ -1214,7 +1218,7 @@
     {
       "id": "road_mot_fill_noramp",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 10,
       "maxzoom": 24,
@@ -1240,7 +1244,7 @@
     {
       "id": "rail",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 13,
       "filter": ["all", ["==", "class", "rail"], ["!=", "brunnel", "tunnel"]],
@@ -1262,7 +1266,7 @@
     {
       "id": "rail_dash",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "filter": ["all", ["==", "class", "rail"], ["!=", "brunnel", "tunnel"]],
@@ -1288,7 +1292,7 @@
     {
       "id": "bridge_service_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -1310,7 +1314,7 @@
     {
       "id": "bridge_minor_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 13,
       "maxzoom": 24,
@@ -1341,7 +1345,7 @@
     {
       "id": "bridge_sec_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 11,
       "maxzoom": 24,
@@ -1373,7 +1377,7 @@
     {
       "id": "bridge_pri_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 8,
       "maxzoom": 24,
@@ -1411,7 +1415,7 @@
     {
       "id": "bridge_trunk_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 5,
       "maxzoom": 24,
@@ -1453,7 +1457,7 @@
     {
       "id": "bridge_mot_case",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 5,
       "maxzoom": 24,
@@ -1497,7 +1501,7 @@
     {
       "id": "bridge_path",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -1524,7 +1528,7 @@
     {
       "id": "bridge_service_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -1546,7 +1550,7 @@
     {
       "id": "bridge_minor_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 15,
       "maxzoom": 24,
@@ -1568,7 +1572,7 @@
     {
       "id": "bridge_sec_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 13,
       "maxzoom": 24,
@@ -1593,7 +1597,7 @@
     {
       "id": "bridge_pri_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 11,
       "maxzoom": 24,
@@ -1618,7 +1622,7 @@
     {
       "id": "bridge_trunk_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 11,
       "maxzoom": 24,
@@ -1647,7 +1651,7 @@
     {
       "id": "bridge_mot_fill",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "transportation",
       "minzoom": 10,
       "maxzoom": 24,
@@ -1678,7 +1682,7 @@
     {
       "id": "building",
       "type": "fill",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "building",
       "layout": { "visibility": "visible" },
       "paint": {
@@ -1695,7 +1699,7 @@
     {
       "id": "building-top",
       "type": "fill",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "building",
       "layout": { "visibility": "visible" },
       "paint": {
@@ -1720,7 +1724,7 @@
     {
       "id": "boundary_country_outline",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "boundary",
       "minzoom": 6,
       "maxzoom": 24,
@@ -1736,7 +1740,7 @@
     {
       "id": "boundary_country_inner",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "boundary",
       "minzoom": 0,
       "filter": ["all", ["==", "admin_level", 2], ["==", "maritime", 0]],
@@ -1785,7 +1789,7 @@
     {
       "id": "state-boundary-bg",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "boundary",
       "filter": ["all", ["==", "admin_level", 4], ["==", "maritime", 0]],
       "paint": {
@@ -1830,7 +1834,7 @@
     {
       "id": "prefecture-boundary",
       "type": "line",
-      "source": "osm",
+      "source": "carto",
       "source-layer": "boundary",
       "filter": ["all", ["==", "admin_level", 4], ["==", "maritime", 0]],
       "layout": { "line-join": "round" },

@@ -11,6 +11,10 @@ html, body, #map {
 	height: 100%;
 	pointer-events: none;
 }
+.wave {
+	stroke: rgba(255, 255, 255, 0.2);
+	fill: rgba(255, 255, 255, 0.1);
+}
 .hypocenter {
 	stroke: none;
 }
@@ -28,13 +32,105 @@ html, body, #map {
 	padding: 4px;
 	pointer-events: none;
 }
-.focused-point {
-	position: absolute;
-	transform: translate(-50%, -50%);
-	padding: 10px;
-	border-radius: 10px;
-	pointer-events: none;
-}
-.hidden {
+.tooltip.hidden {
 	display: none;
+}
+.panel {
+	color: rgb(255, 255, 255);
+	background-color: rgba(0, 0, 0, 0.7);
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: calc(100% - 59px);
+	height: 204px;
+	max-height: calc(100% - 47px);
+	overflow: hidden;
+	transition: height 1s ease;
+}
+.panel.hidden {
+	height: 0;
+}
+.panel-body {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+}
+.panel-column {
+	width: calc(50% - 15px);
+	margin: 10px 0 10px 10px;
+	line-height: 0;
+}
+.panel-column:last-child {
+	margin: 10px;
+}
+.panel-section {
+	margin-bottom: 10px;
+}
+.panel-section:last-child {
+	margin-bottom: 0;
+}
+.panel-section-title {
+	color: #ccc;
+	margin-bottom: 4px;
+	font-size: 12px;
+	line-height: 18px;
+	white-space: nowrap;
+}
+.panel-section-body {
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 30px;
+	white-space: nowrap;
+}
+.panel-date-text {
+	font-size: 12px;
+	line-height: 24px;
+	white-space: nowrap;
+}
+.panel-time-text {
+	white-space: nowrap;
+}
+.panel-location-text {
+	font-size: 18px;
+	line-height: 30px;
+	white-space: nowrap;
+}
+
+@media screen and (min-width: 640px) {
+	.panel {
+		left: 10px;
+		top: 10px;
+		width: 300px;
+		height: calc(100% - 47px);
+	}
+	.panel.hidden {
+		height: 0;
+	}
+	.panel-column {
+		width: calc(100% - 40px);
+		margin: 20px 20px 0 20px;
+	}
+	.panel-column:last-child {
+		margin: 20px;
+	}
+	.panel-section {
+		margin-bottom: 20px;
+	}
+	.panel-section-title {
+		margin-bottom: 10px;
+		font-size: 16px;
+		line-height: 24px;
+	}
+	.panel-section-body {
+		font-size: 40px;
+		line-height: 48px;
+	}
+	.panel-date-text {
+		font-size: 20px;
+		line-height: 30px;
+	}
+	.panel-location-text {
+		font-size: 30px;
+		line-height: 48px;
+	}
 }
