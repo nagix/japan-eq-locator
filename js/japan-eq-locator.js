@@ -3,11 +3,13 @@ const DEGREE_TO_RADIAN = Math.PI / 180;
 const DATE_FORMAT = {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'Asia/Tokyo'
 };
 const TIME_FORMAT = {
     hour: 'numeric',
-    minute: 'numeric'
+    minute: 'numeric',
+    timeZone: 'Asia/Tokyo'
 };
 
 const colorScale = d3.scaleSequential([0, -500000], d3.interpolateSpectral);
@@ -158,7 +160,8 @@ Promise.all([
     if (auto) {
         const dateString = new Date(options.t).toLocaleDateString('ja-JP', DATE_FORMAT);
         const timeString = new Date(options.t).toLocaleTimeString('ja-JP', TIME_FORMAT);
-        const depth = isNaN(options.d) ? '不明' : `${options.d}km`
+        const depth = isNaN(options.d) ? '不明' : +options.d === 0 ? 'ごく浅い' : `${options.d}km`;
+        const scale = options.s ? options.s.replace('-', '弱').replace('+', '強') : '-';
         panel.innerHTML =
             '<div class="panel-body">' +
             '<div class="panel-column">' +
@@ -183,7 +186,7 @@ Promise.all([
             '</div>' +
             '<div class="panel-section">' +
             '<div class="panel-section-title">最大震度</div>' +
-            `<div class="panel-section-body">${options.s}</div>` +
+            `<div class="panel-section-body">${scale}</div>` +
             '</div>' +
             '<div class="panel-section">' +
             '<div class="panel-section-title">マグニチュード</div>' +
@@ -198,7 +201,7 @@ Promise.all([
                 center: [+options.lng, +options.lat],
                 padding: width < 640 ?
                     {top: 200, bottom: 0, left: 0, right: 0} :
-                    {top: 0, bottom: 0, left: 210, right: 0},
+                    {top: 0, bottom: 0, left: 170, right: 0},
                 pitch: 0,
                 zoom: 7,
                 speed: 0.3
@@ -241,7 +244,7 @@ Promise.all([
                     duration: 2000,
                     padding: width < 640 ?
                         {top: 0, bottom: height / 6, left: 0, right: 0} :
-                        {top: 0, bottom: height / 3, left: 210, right: 0}
+                        {top: 0, bottom: height / 3, left: 170, right: 0}
                 });
                 panel.classList.remove('hidden');
                 const repeat = now => {
