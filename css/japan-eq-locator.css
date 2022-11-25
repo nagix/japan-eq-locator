@@ -75,18 +75,18 @@ html, body, #map {
 .panel-section-title {
 	color: #ccc;
 	margin-bottom: 4px;
-	font-size: 12px;
+	font-size: 14px;
 	line-height: 18px;
 	white-space: nowrap;
 }
 .panel-section-body {
-	font-size: 24px;
+	font-size: 28px;
 	font-weight: 700;
 	line-height: 30px;
 	white-space: nowrap;
 }
 .panel-date-text {
-	font-size: 12px;
+	font-size: 14px;
 	line-height: 24px;
 	white-space: nowrap;
 }
@@ -121,11 +121,11 @@ html, body, #map {
 	}
 	.panel-section-title {
 		margin-bottom: 10px;
-		font-size: 16px;
+		font-size: 20px;
 		line-height: 24px;
 	}
 	.panel-section-body {
-		font-size: 40px;
+		font-size: 48px;
 		line-height: 48px;
 	}
 	.panel-date-text {
@@ -133,7 +133,7 @@ html, body, #map {
 		line-height: 30px;
 	}
 	.panel-location-text {
-		font-size: 30px;
+		font-size: 32px;
 		line-height: 48px;
 	}
 }
