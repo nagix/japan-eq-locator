@@ -293,6 +293,9 @@ Promise.all([
                 updateMarker();
                 updateWave(750);
                 panel.style.transition = 'none';
+                const completed = document.createElement('div');
+                completed.id = 'completed';
+                document.body.appendChild(completed);
                 map.on('resize', () => {
                     if (mobile !== isMobile()) {
                         map.jumpTo(calculateCameraOptions(+options.d || 0, 7));
