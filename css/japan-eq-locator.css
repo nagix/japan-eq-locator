@@ -15,6 +15,10 @@ html, body, #map {
 	stroke: rgba(255, 255, 255, 0.3);
 	fill: rgba(255, 255, 255, 0.15);
 }
+.wave-bright {
+	stroke: rgba(255, 255, 255, 0.4);
+	fill: rgba(255, 255, 255, 0.2);
+}
 .hypocenter {
 	stroke: none;
 }
@@ -42,10 +46,10 @@ html, body, #map {
 	left: 0;
 	top: 0;
 	width: calc(100% - 59px);
-	height: 204px;
 	max-height: calc(100% - 47px);
 	overflow: hidden;
-	transition: height 1s ease;
+	transition-property: left, top, width, height;
+	transition-duration: 1s;
 }
 .panel.hidden {
 	height: 0;
@@ -58,7 +62,6 @@ html, body, #map {
 .panel-column {
 	width: calc(50% - 15px);
 	margin: 10px 0 10px 10px;
-	line-height: 0;
 }
 .panel-column:last-child {
 	margin: 10px;
