@@ -104,6 +104,12 @@ Object.assign(tooltip, {
 });
 document.getElementById('map').appendChild(tooltip);
 
+const legend = document.createElement('div');
+Object.assign(legend, {
+    className: 'legend-depth'
+});
+document.getElementById('map').appendChild(legend);
+
 const panel = document.createElement('div');
 Object.assign(panel, {
     className: interactive ? 'panel hidden' : 'panel'

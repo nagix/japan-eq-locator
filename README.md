@@ -4,9 +4,9 @@ An earthquake hypocenter map of Japan.
 
 ![Screenshot](https://nagix.github.io/japan-eq-locator/screenshot1.jpg)
 
-See a [Live Demo](https://nagix.github.io/japan-eq-locator).
+See a [Live Demo](https://nagix.github.io/japan-eq-locator) and [tweets (@EQLocator)](https://twitter.com/EQLocator).
 
-ライブデモは[こちら](https://nagix.github.io/japan-eq-locator)でご覧いただけます。
+[ライブデモ](https://nagix.github.io/japan-eq-locator)および[ツイート (@EQLocator)](https://twitter.com/EQLocator)をご覧ください。
 
 ## About Data (データについて)
 

@@ -1,3 +1,4 @@
 data/h*
+css/*.svg
 js/loader.js
 .DS_Store
