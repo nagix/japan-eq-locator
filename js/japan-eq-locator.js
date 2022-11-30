@@ -12,6 +12,56 @@ const TIME_FORMAT = {
     timeZone: 'Asia/Tokyo'
 };
 
+class MapboxGLButtonControl {
+
+    constructor(optionArray) {
+        this._options = optionArray.map(options => ({
+            className: options.className || '',
+            title: options.title || '',
+            eventHandler: options.eventHandler
+        }));
+    }
+
+    onAdd(map) {
+        const me = this;
+
+        me._map = map;
+
+        me._container = document.createElement('div');
+        me._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+
+        me._buttons = me._options.map(options => {
+            const button = document.createElement('button'),
+                icon = document.createElement('span'),
+                {className, title, eventHandler} = options;
+
+            button.className = className;
+            button.type = 'button';
+            button.title = title;
+            button.setAttribute('aria-label', title);
+            button.onclick = eventHandler;
+
+            icon.className = 'mapboxgl-ctrl-icon';
+            icon.setAttribute('aria-hidden', true);
+            button.appendChild(icon);
+
+            me._container.appendChild(button);
+
+            return button;
+        });
+
+        return me._container;
+    }
+
+    onRemove() {
+        const me = this;
+
+        me._container.parentNode.removeChild(me._container);
+        me._map = undefined;
+    }
+
+}
+
 const colorScale = d3.scaleSequential([0, -500000], d3.interpolateSpectral);
 
 const options = {};
@@ -22,6 +72,9 @@ for (const key of ['lng', 'lat', 'd', 't', 'l', 's', 'm', 'static']) {
 }
 const auto = options.lng && options.lat && options.t;
 const interactive = !(auto && options.static);
+
+const canvasElement = document.querySelector('#map .mapboxgl-canvas');
+const infoBGElement = document.getElementById('info-bg');
 
 const isMobile = () => {
     return document.getElementById('map').clientWidth < 640;
@@ -55,6 +108,29 @@ if (!interactive) {
     map.setPadding(padding);
 }
 let loaded = false;
+
+if (interactive) {
+    map.addControl(new mapboxgl.NavigationControl({visualizePitch: true}));
+    map.addControl(new mapboxgl.FullscreenControl());
+    map.addControl(new MapboxGLButtonControl([{
+        className: 'mapboxgl-ctrl-twitter',
+        title: 'Twitter',
+        eventHandler() {
+            open('https://twitter.com/EQLocator', '_blank');
+        }
+    }, {
+        className: 'mapboxgl-ctrl-info',
+        title: 'About Japan EQ Locator',
+        eventHandler() {
+            infoBGElement.style.display = 'block';
+        }
+    }]));
+
+    infoBGElement.addEventListener('click', () => {
+        infoBGElement.style.display = 'none';
+        canvasElement.focus();
+    });
+}
 
 const svg = document.createElementNS(SVGNS, 'svg');
 svg.setAttributeNS(null, 'class', 'svg');

@@ -10,9 +10,9 @@ See a [Live Demo](https://nagix.github.io/japan-eq-locator) and [tweets (@EQLoca
 
 ## About Data (データについて)
 
-The data for this visualization are sourced from the [hypocenter data](https://www.data.jma.go.jp/eqev/data/bulletin/index.html) by Japan Meteorological Agency.
+The data for this visualization are sourced from [the Seismological Bulletin of Japan](https://www.data.jma.go.jp/eqev/data/bulletin/index.html) by Japan Meteorological Agency.
 
-このビジュアライゼーションは、気象庁の[震源データ](https://www.data.jma.go.jp/eqev/data/bulletin/index.html)を利用しています。
+このビジュアライゼーションは、気象庁の[地震月報(カタログ編)](https://www.data.jma.go.jp/eqev/data/bulletin/index.html)のデータを利用しています。
 
 ## License (ライセンス)
 

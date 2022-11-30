@@ -36,6 +36,27 @@ gtag('config', 'UA-39988758-2');
 <script src="https://cdn.jsdelivr.net/npm/d3-scale-chromatic@3"></script>
 </head>
 <body>
-<div id="map"></div>
+<div id="map">
+  <div id="info-bg" class="bg">
+    <div class="info">
+      <div>Japan EQ Locator について</div>
+      <div>
+        <p><strong>操作方法</strong></p>
+        <p>
+          ドラッグ/上下左右矢印キー: 移動<br>
+          マウスホイール/+-キー: ズーム<br>
+          右マウス/Ctrl + ドラッグ: 方角/傾き<br>
+          2本指ピンチ: 方角/ズーム<br>
+          2本指ドラッグ: 傾き<br>
+          Shift + 左右矢印キー: 方角<br>
+          Shift + 上下矢印キー: 傾き<br>
+        </p>
+        <hr>
+        <p>このデータビジュアライゼーションは <a href="https://nagix.github.io" target="_blank">草薙 昭彦</a> により作成されました。本アプリケーションが利用する地震データは、気象庁の <a href="https://www.data.jma.go.jp/eqev/data/bulletin/index.html" target="_blank">地震月報(カタログ編)</a> において提供されるものです。</p>
+        <p>ソースコードは <a href="https://github.com/nagix/japan-eq-locator" target="_blank">GitHub リポジトリ</a> にて公開されています。</p>
+      </div>
+    </div>
+  </div>
+</div>
 <script src="js/japan-eq-locator.js"></script>
 </body>
