@@ -70,18 +70,28 @@ for (const key of ['lng', 'lat', 'd', 't', 'l', 's', 'm', 'static']) {
     const match = location.search.match(regex);
     options[key] = match ? decodeURIComponent(match[1]) : undefined;
 }
-const auto = options.lng && options.lat && options.t;
+let auto = !!(options.lng && options.lat && options.t);
 const interactive = !(auto && options.static);
+const initialParams = {
+    lng: +options.lng,
+    lat: +options.lat,
+    depth: isNaN(options.d) ? undefined : +options.d,
+    time: options.t,
+    location: options.l,
+    scale: options.s,
+    magnitude: +options.m
+};
+const params = {};
+let flying = false;
 
-const canvasElement = document.querySelector('#map .mapboxgl-canvas');
-const infoBGElement = document.getElementById('info-bg');
+const mapElement = document.getElementById('map');
 
 const isMobile = () => {
-    return document.getElementById('map').clientWidth < 640;
+    return mapElement.clientWidth < 640;
 };
 const calculateCameraOptions = (depth, maxZoom) => {
     const mobile = isMobile();
-    const height = document.getElementById('map').clientHeight;
+    const height = mapElement.clientHeight;
     const adjustedHeight = mobile ? height - 196 : height;
     const zoom = 5.73 - Math.log2(depth) + Math.log2(adjustedHeight);
     const padding = adjustedHeight * 0.4 * Math.min(depth / adjustedHeight * Math.pow(maxZoom - 5.09, 2), 1);
@@ -93,13 +103,13 @@ const calculateCameraOptions = (depth, maxZoom) => {
             {top: 0, bottom: padding, left: 310, right: 0}
     };
 };
-const {zoom, padding} = calculateCameraOptions(+options.d || 0, 7);
+const {zoom, padding} = calculateCameraOptions(initialParams.depth || 0, 7);
 
 const map = new mapboxgl.Map({
     accessToken: 'pk.eyJ1IjoibmFnaXgiLCJhIjoiY2xhcDc4MXYyMGZxOTN5bWt4NHU4azJlbCJ9.BvJ83DIBKKtMgTsDHTZekw',
     container: 'map',
     style: 'data/style.json',
-    center: interactive ? auto ? [137.25, 36.5] : [139.7670, 35.6814] : [+options.lng, +options.lat],
+    center: interactive ? auto ? [137.25, 36.5] : [139.7670, 35.6814] : [initialParams.lng, initialParams.lat],
     zoom: interactive ? auto ? 4 : 7 : zoom,
     pitch: interactive && auto ? 0 : 60,
     interactive
@@ -108,6 +118,9 @@ if (!interactive) {
     map.setPadding(padding);
 }
 let loaded = false;
+
+const canvasElement = document.querySelector('#map .mapboxgl-canvas');
+const infoBGElement = document.getElementById('info-bg');
 
 if (interactive) {
     map.addControl(new mapboxgl.NavigationControl({visualizePitch: true}));
@@ -134,7 +147,7 @@ if (interactive) {
 
 const svg = document.createElementNS(SVGNS, 'svg');
 svg.setAttributeNS(null, 'class', 'svg');
-document.getElementById('map').appendChild(svg);
+mapElement.appendChild(svg);
 
 const defs = document.createElementNS(SVGNS, 'defs');
 defs.innerHTML =
@@ -178,19 +191,19 @@ const tooltip = document.createElement('div');
 Object.assign(tooltip, {
     className: 'tooltip hidden'
 });
-document.getElementById('map').appendChild(tooltip);
+mapElement.appendChild(tooltip);
 
 const legend = document.createElement('div');
 Object.assign(legend, {
     className: 'legend-depth'
 });
-document.getElementById('map').appendChild(legend);
+mapElement.appendChild(legend);
 
 const panel = document.createElement('div');
 Object.assign(panel, {
-    className: interactive ? 'panel hidden' : 'panel'
+    className: interactive ? 'panel hidden' : 'panel static'
 });
-document.getElementById('map').appendChild(panel);
+mapElement.appendChild(panel);
 
 Promise.all([
     fetch('data/hypocenters.json').then(res => res.json()).then(data =>
@@ -223,56 +236,92 @@ Promise.all([
     // Workaround for deck.gl #3522
     map.__deck.props.getCursor = () => map.getCanvas().style.cursor;
 
-    if (!auto) {
-        const updateMarker = info => {
-            const [x, y] = info.viewport.project(info.object.position.slice(0, 2));
+    const updateMarker = info => {
+        const viewport = map.__deck.getViewports()[0];
+        const [ex, ey] = auto ?
+            viewport.project([params.lng, params.lat]) :
+            info.viewport.project(info.object.position.slice(0, 2));
+        const [hx, hy] = auto ?
+            viewport.project([params.lng, params.lat, -(params.depth || 0) * 1000]) :
+            [info.x, info.y];
+        const depth = auto ? -(params.depth || 0) * 1000 : info.object.position[2];
 
-            hypocenterCircle.setAttributeNS(null, 'cx', info.x);
-            hypocenterCircle.setAttributeNS(null, 'cy', info.y);
-            hypocenterCircle.setAttributeNS(null, 'fill', colorScale(info.object.position[2]));
-            hypocenterCircle.setAttributeNS(null, 'visibility', 'visible');
+        wave1.setAttributeNS(null, 'cx', hx);
+        wave1.setAttributeNS(null, 'cy', hy);
+        wave1.setAttributeNS(null, 'visibility', 'visible');
 
-            leader.setAttributeNS(null, 'x1', info.x);
-            leader.setAttributeNS(null, 'y1', info.y);
-            leader.setAttributeNS(null, 'x2', x);
-            leader.setAttributeNS(null, 'y2', y);
-            leader.setAttributeNS(null, 'visibility', 'visible');
+        wave2.setAttributeNS(null, 'cx', hx);
+        wave2.setAttributeNS(null, 'cy', hy);
+        wave2.setAttributeNS(null, 'visibility', 'visible');
 
-            epicenterGroup.style.transform = `translate(${x}px, ${y}px)`;
-            epicenterCircle.style.transform = `scale(1, ${Math.cos(map.getPitch() * DEGREE_TO_RADIAN)})`;
-            epicenterCircle.setAttributeNS(null, 'visibility', 'visible');
+        hypocenterCircle.setAttributeNS(null, 'cx', hx);
+        hypocenterCircle.setAttributeNS(null, 'cy', hy);
+        hypocenterCircle.setAttributeNS(null, 'fill', colorScale(depth));
+        hypocenterCircle.setAttributeNS(null, 'visibility', 'visible');
 
+        leader.setAttributeNS(null, 'x1', hx);
+        leader.setAttributeNS(null, 'y1', hy);
+        leader.setAttributeNS(null, 'x2', ex);
+        leader.setAttributeNS(null, 'y2', ey);
+        leader.setAttributeNS(null, 'visibility', 'visible');
+
+        epicenterGroup.style.transform = `translate(${ex}px, ${ey}px)`;
+        epicenterCircle.style.transform = `scale(1, ${Math.cos(map.getPitch() * DEGREE_TO_RADIAN)})`;
+        epicenterCircle.setAttributeNS(null, 'visibility', 'visible');
+
+        if (!auto) {
             tooltip.style.left = info.x + 4 + 'px';
             tooltip.style.top = info.y + 4 + 'px';
-            tooltip.innerHTML = (-info.object.position[2] / 1000).toFixed(2) + 'km';
+            tooltip.innerHTML = (-depth / 1000).toFixed(2) + 'km';
             tooltip.classList.remove('hidden');
-        };
-        const hideMarker = () => {
-            hypocenterCircle.setAttributeNS(null, 'visibility', 'hidden');
-            leader.setAttributeNS(null, 'visibility', 'hidden');
-            epicenterCircle.setAttributeNS(null, 'visibility', 'hidden');
-            tooltip.classList.add('hidden');
-        };
+        }
+    };
 
-        hypocenterLayer.setProps({
-            onHover: info => {
-                if (info.layer && info.layer.id === 'hypocenters') {
-                    if (info.object) {
-                        updateMarker(info);
-                    } else {
-                        hideMarker();
-                    }
-                    return true;
-                }
+    const hideMarker = () => {
+        wave1.setAttributeNS(null, 'visibility', 'hidden');
+        wave2.setAttributeNS(null, 'visibility', 'hidden');
+        hypocenterCircle.setAttributeNS(null, 'visibility', 'hidden');
+        leader.setAttributeNS(null, 'visibility', 'hidden');
+        epicenterCircle.setAttributeNS(null, 'visibility', 'hidden');
+        tooltip.classList.add('hidden');
+    };
+
+    const updateWave = now => {
+        wave1.setAttributeNS(null, 'r', now / 10 % 300);
+        wave1.setAttributeNS(null, 'opacity', 1 - now / 3000 % 1);
+        wave2.setAttributeNS(null, 'r', (now / 10 + 150) % 300);
+        wave2.setAttributeNS(null, 'opacity', 1 - (now / 3000 + 0.5) % 1);
+    };
+
+    const onHover = info => {
+        if (info.layer && info.layer.id === 'hypocenters') {
+            if (info.object) {
+                updateMarker(info);
+            } else {
+                hideMarker();
             }
-        });
-        map.on('move', hideMarker);
-        map.on('resize', hideMarker);
-    } else {
-        const dateString = new Date(options.t).toLocaleDateString('ja-JP', DATE_FORMAT);
-        const timeString = new Date(options.t).toLocaleTimeString('ja-JP', TIME_FORMAT);
-        const depth = isNaN(options.d) ? '不明' : +options.d === 0 ? 'ごく浅い' : `${options.d}km`;
-        const scale = options.s ? options.s.replace('-', '弱').replace('+', '強') : '-';
+            return true;
+        }
+    };
+
+    const setHypocenter = _params => {
+        auto = !!(_params && _params.lng && _params.lat && _params.time);
+        if (!auto) {
+            hideMarker();
+            map.easeTo({
+                padding: {top: 0, bottom: 0, left: 0, right: 0},
+                duration: 1000
+            });
+            panel.classList.add('hidden');
+            hypocenterLayer.setProps({onHover});
+            return;
+        }
+        Object.assign(params, _params);
+
+        const dateString = new Date(params.time).toLocaleDateString('ja-JP', DATE_FORMAT);
+        const timeString = new Date(params.time).toLocaleTimeString('ja-JP', TIME_FORMAT);
+        const depthString = isNaN(params.depth) ? '不明' : params.depth === 0 ? 'ごく浅い' : `${params.depth}km`;
+        const scaleString = params.scale ? params.scale.replace('-', '弱').replace('+', '強') : '-';
 
         panel.innerHTML =
             '<div class="panel-body">' +
@@ -287,104 +336,102 @@ Promise.all([
             '<div class="panel-section">' +
             '<div class="panel-section-title">震央地名</div>' +
             '<div class="panel-section-body">' +
-            `<div class="panel-location-text">${options.l}</div>` +
+            `<div class="panel-location-text">${params.location}</div>` +
             '</div>' +
             '</div>' +
             '</div>' +
             '<div class="panel-column">' +
             '<div class="panel-section">' +
             '<div class="panel-section-title">震源の深さ</div>' +
-            `<div class="panel-section-body">${depth}</div>` +
+            `<div class="panel-section-body">${depthString}</div>` +
             '</div>' +
             '<div class="panel-section">' +
             '<div class="panel-section-title">最大震度</div>' +
-            `<div class="panel-section-body">${scale}</div>` +
+            `<div class="panel-section-body">${scaleString}</div>` +
             '</div>' +
             '<div class="panel-section">' +
             '<div class="panel-section-title">マグニチュード</div>' +
-            `<div class="panel-section-body">${options.m}</div>` +
+            `<div class="panel-section-body">${params.magnitude}</div>` +
             '</div>' +
             '</div>' +
             '</div>';
 
-        const updateMarker = () => {
-            const viewport = map.__deck.getViewports()[0];
-            const [ex, ey] = viewport.project([+options.lng, +options.lat]);
-            const [hx, hy] = viewport.project([+options.lng, +options.lat, -(+options.d || 0) * 1000]);
+        if (interactive) {
+            const closeButton = document.createElement('div');
+            Object.assign(closeButton, {
+                className: 'close-button'
+            });
+            closeButton.addEventListener('click', () => {
+                setHypocenter();
+                canvasElement.focus();
+            });
+            panel.appendChild(closeButton);
 
-            wave1.setAttributeNS(null, 'cx', hx);
-            wave1.setAttributeNS(null, 'cy', hy);
-            wave1.setAttributeNS(null, 'visibility', 'visible');
+            hypocenterLayer.setProps({onHover: null});
+            map.flyTo({
+                center: [params.lng, params.lat],
+                pitch: 0,
+                zoom: 7,
+                speed: 0.3
+            });
+            flying = true;
+            map.once('moveend', () => {
+                flying = false;
+                panel.classList.remove('hidden');
 
-            wave2.setAttributeNS(null, 'cx', hx);
-            wave2.setAttributeNS(null, 'cy', hy);
-            wave2.setAttributeNS(null, 'visibility', 'visible');
+                const {zoom, padding} = calculateCameraOptions(params.depth || 0, 9);
+                map.easeTo({pitch: 60, zoom, padding, duration: 2000});
+            });
+        } else {
+            updateMarker();
+            updateWave(750);
+        }   
+    };
 
-            hypocenterCircle.setAttributeNS(null, 'cx', hx);
-            hypocenterCircle.setAttributeNS(null, 'cy', hy);
-            hypocenterCircle.setAttributeNS(null, 'fill', colorScale(-(+options.d || 0) * 1000));
-            hypocenterCircle.setAttributeNS(null, 'visibility', 'visible');
-
-            leader.setAttributeNS(null, 'x1', hx);
-            leader.setAttributeNS(null, 'y1', hy);
-            leader.setAttributeNS(null, 'x2', ex);
-            leader.setAttributeNS(null, 'y2', ey);
-            leader.setAttributeNS(null, 'visibility', 'visible');
-
-            epicenterGroup.style.transform = `translate(${ex}px, ${ey}px)`;
-            epicenterCircle.style.transform = `scale(1, ${Math.cos(map.getPitch() * DEGREE_TO_RADIAN)})`;
-            epicenterCircle.setAttributeNS(null, 'visibility', 'visible');
+    let mobile = isMobile();
+    if (interactive) {
+        const repeat = now => {
+            updateWave(now);
+            requestAnimationFrame(repeat);
         };
-        const updateWave = now => {
-            wave1.setAttributeNS(null, 'r', now / 10 % 300);
-            wave1.setAttributeNS(null, 'opacity', 1 - now / 3000 % 1);
-            wave2.setAttributeNS(null, 'r', (now / 10 + 150) % 300);
-            wave2.setAttributeNS(null, 'opacity', 1 - (now / 3000 + 0.5) % 1);
-        };
+        requestAnimationFrame(repeat);
 
-        map.once(loaded ? 'idle' : 'load', () => {
-            let mobile = isMobile();
-
-            if (interactive) {
-                map.flyTo({
-                    center: [+options.lng, +options.lat],
-                    pitch: 0,
-                    zoom: 7,
-                    speed: 0.3
-                });
-                map.once('moveend', () => {
-                    map.on('move', updateMarker);
-                    map.on('resize', () => {
-                        if (mobile !== isMobile()) {
-                            const {zoom, padding} = calculateCameraOptions(+options.d || 0, 9);
-                            map.easeTo({zoom, padding, duration: 1000});
-                            mobile = !mobile;
-                        }
-                    });
-                    const repeat = now => {
-                        updateWave(now);
-                        requestAnimationFrame(repeat);
-                    };
-                    requestAnimationFrame(repeat);
-                    panel.classList.remove('hidden');
-
-                    const {zoom, padding} = calculateCameraOptions(+options.d || 0, 9);
-                    map.easeTo({pitch: 60, zoom, padding, duration: 2000});
-                });
-            } else {
+        map.on('move', () => {
+            if (!auto) {
+                hideMarker();
+            } else if (!flying) {
                 updateMarker();
-                updateWave(750);
-                panel.style.transition = 'none';
+            }
+        });
+
+        map.on('resize', () => {
+            if (!auto) {
+                hideMarker();
+            } else if (!flying && mobile !== isMobile()) {
+                const {zoom, padding} = calculateCameraOptions(params.depth || 0, 9);
+                map.easeTo({zoom, padding, duration: 1000});
+                mobile = !mobile;
+            }
+        });
+    } else {
+        map.on('resize', () => {
+            if (mobile !== isMobile()) {
+                map.jumpTo(calculateCameraOptions(params.depth || 0, 7));
+                mobile = !mobile;
+            }
+            updateMarker();
+        });
+    }
+
+    if (!auto) {
+        hypocenterLayer.setProps({onHover});
+    } else {
+        map.once(loaded ? 'idle' : 'load', () => {
+            setHypocenter(initialParams);
+            if (!interactive) {
                 const completed = document.createElement('div');
                 completed.id = 'completed';
                 document.body.appendChild(completed);
-                map.on('resize', () => {
-                    if (mobile !== isMobile()) {
-                        map.jumpTo(calculateCameraOptions(+options.d || 0, 7));
-                        mobile = !mobile;
-                    }
-                    updateMarker();
-                });
             }
         });
     }
