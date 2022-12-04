@@ -372,8 +372,10 @@ Promise.all([
     };
 
     const setHypocenter = _params => {
-        hideMarker();
-        panel.classList.add('hidden');
+        if (interactive) {
+            hideMarker();
+            panel.classList.add('hidden');
+        }
         auto = !!(_params && _params.lng && _params.lat && _params.time);
         if (!auto) {
             map.easeTo({
