@@ -268,7 +268,9 @@ Promise.all([
             }
             options.l = quake.anm;
             options.t = quake.at;
-            options.m = quake.mag;
+            if (quake.mag !== 'Ｍ不明') {
+                options.m = quake.mag;
+            }
             if (quake.maxi !== '') {
                 options.s = quake.maxi;
             }
