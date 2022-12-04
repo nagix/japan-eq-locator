@@ -72,15 +72,16 @@ for (const key of ['lng', 'lat', 'd', 't', 'l', 's', 'm', 'static']) {
 }
 let auto = !!(options.lng && options.lat && options.t);
 const interactive = !(auto && options.static);
-const initialParams = {
+const getParams = options => ({
     lng: +options.lng,
     lat: +options.lat,
     depth: isNaN(options.d) ? undefined : +options.d,
     time: options.t,
     location: options.l,
     scale: options.s,
-    magnitude: +options.m
-};
+    magnitude: isNaN(options.m) ? undefined : +options.m
+});
+const initialParams = getParams(options);
 const params = {};
 let flying = false;
 
@@ -120,12 +121,19 @@ if (!interactive) {
 let loaded = false;
 
 const canvasElement = document.querySelector('#map .mapboxgl-canvas');
+const listBGElement = document.getElementById('list-bg');
 const infoBGElement = document.getElementById('info-bg');
 
 if (interactive) {
     map.addControl(new mapboxgl.NavigationControl({visualizePitch: true}));
     map.addControl(new mapboxgl.FullscreenControl());
     map.addControl(new MapboxGLButtonControl([{
+        className: 'mapboxgl-ctrl-list',
+        title: 'Recent earthquakes',
+        eventHandler() {
+            listBGElement.style.display = 'block';
+        }
+    }, {
         className: 'mapboxgl-ctrl-twitter',
         title: 'Twitter',
         eventHandler() {
@@ -139,6 +147,10 @@ if (interactive) {
         }
     }]));
 
+    listBGElement.addEventListener('click', () => {
+        listBGElement.style.display = 'none';
+        canvasElement.focus();
+    });
     infoBGElement.addEventListener('click', () => {
         infoBGElement.style.display = 'none';
         canvasElement.focus();
@@ -206,6 +218,7 @@ Object.assign(panel, {
 mapElement.appendChild(panel);
 
 Promise.all([
+    fetch('https://www.jma.go.jp/bosai/quake/data/list.json').then(res => res.json()),
     fetch('data/hypocenters.json').then(res => res.json()).then(data =>
         new deck.MapboxLayer({
             id: 'hypocenters',
@@ -230,11 +243,65 @@ Promise.all([
             loaded = true;
         });
     })
-]).then(([hypocenterLayer]) => {
+]).then(([quakes, hypocenterLayer]) => {
     map.addLayer(hypocenterLayer, 'waterway');
 
     // Workaround for deck.gl #3522
     map.__deck.props.getCursor = () => map.getCanvas().style.cursor;
+
+    const listElement = document.querySelector('#list>div:last-child');
+    if (listElement) {
+        const eids = {};
+        for (const quake of quakes) {
+            if (quake.ttl !== '震源・震度情報' && quake.ttl !== '遠地地震に関する情報') {
+                continue;
+            }
+            if (eids[quake.eid]) {
+                continue;
+            }
+            const options = {};
+            const matches = quake.cod.match(/([+-][\d\.]+)([+-][\d\.]+)([+-]\d+)?/);
+            options.lng = +matches[2];
+            options.lat = +matches[1];
+            if (matches[3] !== '') {
+                options.d = Math.abs(+matches[3] / 1000)
+            }
+            options.l = quake.anm;
+            options.t = quake.at;
+            options.m = quake.mag;
+            if (quake.maxi !== '') {
+                options.s = quake.maxi;
+            }
+            eids[quake.eid] = true;
+
+            const dateString = new Date(options.t).toLocaleDateString('ja-JP', DATE_FORMAT);
+            const timeString = new Date(options.t).toLocaleTimeString('ja-JP', TIME_FORMAT);
+            const scaleString = options.s ? '震度' + options.s.replace('-', '弱').replace('+', '強') : '';
+            const magnitudeString = isNaN(options.m) ? '不明' : options.m;
+
+            const listItem = document.createElement('div');
+            Object.assign(listItem, {
+                id: quake.eid,
+                className: 'menu-item',
+                innerHTML: `<div class="menu-check"></div><div class="menu-text">${dateString} ${timeString}<br>${options.l} M${magnitudeString} ${scaleString}</div>`
+            });
+            listItem.addEventListener('click', () => {
+                const activeListItem = listElement.querySelector('.active');
+                if (activeListItem) {
+                    if (activeListItem === listItem) {
+                        return;
+                    }
+                    activeListItem.classList.remove('active');
+                }
+                listItem.classList.add('active');
+                history.pushState({}, '', location.href.replace(/\?.*/, '') + '?' +
+                    Object.keys(options).map(key => `${key}=${options[key]}`).join('&')
+                );
+                setHypocenter(getParams(options));
+            });
+            listElement.appendChild(listItem);
+        }
+    }
 
     const updateMarker = info => {
         const viewport = map.__deck.getViewports()[0];
@@ -305,14 +372,14 @@ Promise.all([
     };
 
     const setHypocenter = _params => {
+        hideMarker();
+        panel.classList.add('hidden');
         auto = !!(_params && _params.lng && _params.lat && _params.time);
         if (!auto) {
-            hideMarker();
             map.easeTo({
                 padding: {top: 0, bottom: 0, left: 0, right: 0},
                 duration: 1000
             });
-            panel.classList.add('hidden');
             hypocenterLayer.setProps({onHover});
             return;
         }
@@ -322,6 +389,7 @@ Promise.all([
         const timeString = new Date(params.time).toLocaleTimeString('ja-JP', TIME_FORMAT);
         const depthString = isNaN(params.depth) ? '不明' : params.depth === 0 ? 'ごく浅い' : `${params.depth}km`;
         const scaleString = params.scale ? params.scale.replace('-', '弱').replace('+', '強') : '-';
+        const magnitudeString = isNaN(params.magnitude) ? '不明' : params.magnitude;
 
         panel.innerHTML =
             '<div class="panel-body">' +
@@ -351,7 +419,7 @@ Promise.all([
             '</div>' +
             '<div class="panel-section">' +
             '<div class="panel-section-title">マグニチュード</div>' +
-            `<div class="panel-section-body">${params.magnitude}</div>` +
+            `<div class="panel-section-body">${magnitudeString}</div>` +
             '</div>' +
             '</div>' +
             '</div>';
@@ -362,6 +430,10 @@ Promise.all([
                 className: 'close-button'
             });
             closeButton.addEventListener('click', () => {
+                const activeListItem = listElement.querySelector('.active');
+                if (activeListItem) {
+                    activeListItem.classList.remove('active');
+                }
                 setHypocenter();
                 canvasElement.focus();
             });
@@ -372,6 +444,7 @@ Promise.all([
                 center: [params.lng, params.lat],
                 pitch: 0,
                 zoom: 7,
+                padding: {top: 0, bottom: 0, left: 0, right: 0},
                 speed: 0.3
             });
             flying = true;

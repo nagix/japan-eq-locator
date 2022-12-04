@@ -1,7 +1,12 @@
 html, body, #map {
 	width: 100%;
 	height: 100%;
+}
+body {
 	margin: 0;
+	position: absolute;
+	color: #333;
+	font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 .mapboxgl-ctrl-group {
 	border-radius: 10px;
@@ -22,6 +27,9 @@ html, body, #map {
 .mapboxgl-ctrl-group button:hover:only-child {
 	border-radius: inherit;
 }
+.mapboxgl-ctrl button.mapboxgl-ctrl-list .mapboxgl-ctrl-icon {
+	background: no-repeat center/21px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23333'%3E%3Cpath d='M40 48C26.7 48 16 58.7 16 72v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V232c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V392c0-13.3-10.7-24-24-24H40z'/%3E%3C/svg%3E");
+}
 .mapboxgl-ctrl button.mapboxgl-ctrl-twitter .mapboxgl-ctrl-icon {
 	background: no-repeat center/21px url("data:image/svg+xml,%3Csvg width='1200pt' height='1200pt' version='1.1' viewBox='0 0 1200 1200' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cdefs%3E%3ClinearGradient id='linearGradient896' x1='894.9' x2='894.9' y1='1496' y2='833.1' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23373f51' offset='0'/%3E%3Cstop stop-color='%23545e75' offset='1'/%3E%3C/linearGradient%3E%3ClinearGradient id='linearGradient912' x1='953.2' x2='953.2' y1='298.5' y2='738.6' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23d34e24' offset='0'/%3E%3Cstop stop-color='%23f28123' offset='1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg transform='translate(-300,-300)'%3E%3Cpath d='m1419 844.3h-430.7l-84.29 210 94.92 13.59-128.8 268-53.88-1.656 66.98-191.4-107.9-15.48 66.91-283-460.8-4e-3v655.8h1038z' fill='url(%23linearGradient896)' fill-rule='evenodd'/%3E%3Cpath d='m900 300c-167.5 6e-3 -335.1 47.46-481.1 142.3l36.94 56.83c269.3-175 619-175 888.3 0l36.91-56.83c-146-94.91-313.5-142.4-481.1-142.3zm0.0308 160c-126.3 0-252.7 33.19-365.1 99.58l34.49 58.42c203.5-120.1 457.8-120.1 661.2 0l34.51-58.42c-112.4-66.38-238.8-99.58-365.1-99.58zm-8e-3 160.1c-84.64 0-169.3 19.31-246.8 57.92l30.29 60.82c135.9-67.7 297.2-67.68 433.1 0l30.26-60.82c-77.54-38.62-162.2-57.92-246.8-57.92z' fill='url(%23linearGradient912)'/%3E%3C/g%3E%3C/svg%3E%0A");
 }
@@ -37,6 +45,63 @@ html, body, #map {
 	background-color: rgba(0, 0, 0, 0.5);;
 	display: none;
 	z-index: 99;
+}
+.menu {
+	top: 10px;
+	right: 60px;
+	position: absolute;
+	background-color: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	border-radius: 10px;
+}
+.menu>div {
+	font-size: 14px;
+	line-height: 39px;
+}
+.menu>div:first-child {
+	height: 39px;
+	border-radius: 10px 10px 0 0;
+	background-color: #000;
+	color: #fff;
+	text-align: center;
+	font-weight: bold;
+	pointer-events: none;
+}
+.menu>div:last-child {
+	max-height: calc(100% - 59px);
+	border-radius: 0 0 10px 10px;
+}
+.menu-item {
+	padding: 6px 10px;
+	background-color: transparent;
+	cursor: pointer;
+	border-top: 1px solid #ddd;
+	white-space: nowrap;
+}
+.menu-item:hover {
+	background-color: rgba(0, 0, 0, .05);
+}
+.menu-item>div {
+	display: inline-block;
+	vertical-align: top;
+	height: 40px;
+}
+.menu-item .menu-check {
+	width: 19px;
+	margin-right: 10px;
+}
+.menu-item.active .menu-check {
+	background: no-repeat center/19px url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23333'%3E%3Cpath d='M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z'/%3E%3C/svg%3E");
+}
+.menu-item .menu-text {
+	line-height: 20px;
+}
+#list {
+	height: calc(100% - 20px);
+}
+#list>div:last-child {
+	max-height: calc(100% - 39px);
+	overflow-y: scroll;
 }
 .info {
 	position: absolute;
