@@ -393,7 +393,7 @@ Promise.all([
         const timeString = new Date(params.time).toLocaleTimeString('ja-JP', TIME_FORMAT);
         const depthString = isNaN(params.depth) ? '不明' : params.depth === 0 ? 'ごく浅い' : `${params.depth}km`;
         const scaleString = params.scale ? params.scale.replace('-', '弱').replace('+', '強') : '-';
-        const magnitudeString = isNaN(params.magnitude) ? '不明' : params.magnitude;
+        const magnitudeString = isNaN(params.magnitude) ? '不明' : params.magnitude.toFixed(1);
 
         panel.innerHTML =
             '<div class="panel-body">' +
