@@ -10,9 +10,16 @@
     "osm": {
       "type": "vector",
       "url": "https://tile.openstreetmap.jp/data/planet.json"
+    },
+    "intensity": {
+      "type": "geojson",
+      "data": {
+        "type": "FeatureCollection",
+        "features": []
+      }
     }
   },
-  "sprite": "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/sprite",
+  "sprite": "https://nagix.github.io/japan-eq-locator/data/intensity",
   "glyphs": "https://tiles.basemaps.cartocdn.com/fonts/{fontstack}/{range}.pbf",
   "layers": [
     {
@@ -1854,9 +1861,23 @@
           ]
         }
       }
+    },
+    {
+      "id": "intensity",
+      "type": "symbol",
+      "source": "intensity",
+      "layout": {
+        "icon-image": ["concat", "intensity-", ["get", "intensity"]],
+        "icon-allow-overlap": true,
+        "symbol-sort-key": [
+          "index-of",
+          ["get", "intensity"],
+          ["literal", ["1", "2", "3", "4", "5-", "5+", "6-", "6+", "7"]]
+        ]
+      }
     }
   ],
-"fog": {
+  "fog": {
     "range": [1, 20],
     "color": "#222227",
     "horizon-blend": 0.5,

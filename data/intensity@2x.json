@@ -1,0 +1,74 @@
+{
+  "intensity-1": {
+    "width": 32,
+    "height": 32,
+    "x": 0,
+    "y": 0,
+    "pixelRatio": 2,
+    "visible": true
+  },
+  "intensity-2": {
+    "width": 32,
+    "height": 32,
+    "x": 32,
+    "y": 0,
+    "pixelRatio": 2,
+    "visible": true
+  },
+  "intensity-3": {
+    "width": 32,
+    "height": 32,
+    "x": 64,
+    "y": 0,
+    "pixelRatio": 2,
+    "visible": true
+  },
+  "intensity-4": {
+    "width": 32,
+    "height": 32,
+    "x": 0,
+    "y": 32,
+    "pixelRatio": 2,
+    "visible": true
+  },
+  "intensity-5-": {
+    "width": 32,
+    "height": 32,
+    "x": 32,
+    "y": 32,
+    "pixelRatio": 2,
+    "visible": true
+  },
+  "intensity-5+": {
+    "width": 32,
+    "height": 32,
+    "x": 64,
+    "y": 32,
+    "pixelRatio": 2,
+    "visible": true
+  },
+  "intensity-6-": {
+    "width": 32,
+    "height": 32,
+    "x": 0,
+    "y": 64,
+    "pixelRatio": 2,
+    "visible": true
+  },
+  "intensity-6+": {
+    "width": 32,
+    "height": 32,
+    "x": 32,
+    "y": 64,
+    "pixelRatio": 2,
+    "visible": true
+  },
+  "intensity-7": {
+    "width": 32,
+    "height": 32,
+    "x": 64,
+    "y": 64,
+    "pixelRatio": 2,
+    "visible": true
+  }
+}

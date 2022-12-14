@@ -65,7 +65,7 @@ class MapboxGLButtonControl {
 const colorScale = d3.scaleSequential([0, -500000], d3.interpolateSpectral);
 
 const options = {};
-for (const key of ['lng', 'lat', 'd', 't', 'l', 's', 'm', 'static']) {
+for (const key of ['e', 'lng', 'lat', 'd', 't', 'l', 's', 'm', 'static']) {
     const regex = new RegExp(`(?:\\?|&)${key}=(.*?)(?:&|$)`);
     const match = location.search.match(regex);
     options[key] = match ? decodeURIComponent(match[1]) : undefined;
@@ -73,16 +73,18 @@ for (const key of ['lng', 'lat', 'd', 't', 'l', 's', 'm', 'static']) {
 let auto = !!(options.lng && options.lat && options.t);
 const interactive = !(auto && options.static);
 const getParams = options => ({
+    eid: options.e,
     lng: +options.lng,
     lat: +options.lat,
     depth: isNaN(options.d) ? undefined : +options.d,
     time: options.t,
     location: options.l,
-    scale: options.s,
+    intensity: options.s,
     magnitude: isNaN(options.m) ? undefined : +options.m
 });
 const initialParams = getParams(options);
 const params = {};
+const eids = {};
 let flying = false;
 
 const mapElement = document.getElementById('map');
@@ -251,7 +253,6 @@ Promise.all([
 
     const listElement = document.querySelector('#list>div:last-child');
     if (listElement) {
-        const eids = {};
         for (const quake of quakes) {
             if (quake.ttl !== '震源・震度情報' && quake.ttl !== '遠地地震に関する情報') {
                 continue;
@@ -261,6 +262,7 @@ Promise.all([
             }
             const options = {};
             const matches = quake.cod.match(/([+-][\d\.]+)([+-][\d\.]+)([+-]\d+)?/);
+            options.e = quake.eid;
             options.lng = +matches[2];
             options.lat = +matches[1];
             if (matches[3] !== '') {
@@ -274,18 +276,18 @@ Promise.all([
             if (quake.maxi !== '') {
                 options.s = quake.maxi;
             }
-            eids[quake.eid] = true;
+            eids[quake.eid] = quake;
 
             const dateString = new Date(options.t).toLocaleDateString('ja-JP', DATE_FORMAT);
             const timeString = new Date(options.t).toLocaleTimeString('ja-JP', TIME_FORMAT);
-            const scaleString = options.s ? '震度' + options.s.replace('-', '弱').replace('+', '強') : '';
+            const intensityString = options.s ? '震度' + options.s.replace('-', '弱').replace('+', '強') : '';
             const magnitudeString = isNaN(options.m) ? '不明' : options.m;
 
             const listItem = document.createElement('div');
             Object.assign(listItem, {
                 id: quake.eid,
-                className: 'menu-item',
-                innerHTML: `<div class="menu-check"></div><div class="menu-text">${dateString} ${timeString}<br>${options.l} M${magnitudeString} ${scaleString}</div>`
+                className: quake.eid === initialParams.eid ? 'menu-item active' : 'menu-item',
+                innerHTML: `<div class="menu-check"></div><div class="menu-text">${dateString} ${timeString}<br>${options.l} M${magnitudeString} ${intensityString}</div>`
             });
             listItem.addEventListener('click', () => {
                 const activeListItem = listElement.querySelector('.active');
@@ -300,6 +302,7 @@ Promise.all([
                     Object.keys(options).map(key => `${key}=${options[key]}`).join('&')
                 );
                 setHypocenter(getParams(options));
+                updateIntensity();
             });
             listElement.appendChild(listItem);
         }
@@ -362,6 +365,29 @@ Promise.all([
         wave2.setAttributeNS(null, 'opacity', 1 - (now / 3000 + 0.5) % 1);
     };
 
+    const updateIntensity = () => {
+        const quake = eids[params.eid];
+        if (!quake) {
+            return Promise.resolve();
+        }
+        return fetch(`https://www.jma.go.jp/bosai/quake/data/${quake.json}`).then(res => res.json()).then(data => {
+            const features = data.Body.Intensity ? [].concat(...data.Body.Intensity.Observation.Pref.map(x => [].concat(...x.Area.map(x => [].concat(...x.City.map(x => x.IntensityStation.map(x => ({
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [x.latlon.lon, x.latlon.lat]
+                },
+                properties: {
+                    intensity: x.Int
+                }
+            })))))))) : [];
+            map.getSource('intensity').setData({
+                type: 'FeatureCollection',
+                features
+            });
+        });
+    };
+
     const onHover = info => {
         if (info.layer && info.layer.id === 'hypocenters') {
             if (info.object) {
@@ -377,6 +403,7 @@ Promise.all([
         if (interactive) {
             hideMarker();
             panel.classList.add('hidden');
+            map.setLayoutProperty('intensity', 'visibility', 'none');
         }
         auto = !!(_params && _params.lng && _params.lat && _params.time);
         if (!auto) {
@@ -392,7 +419,7 @@ Promise.all([
         const dateString = new Date(params.time).toLocaleDateString('ja-JP', DATE_FORMAT);
         const timeString = new Date(params.time).toLocaleTimeString('ja-JP', TIME_FORMAT);
         const depthString = isNaN(params.depth) ? '不明' : params.depth === 0 ? 'ごく浅い' : `${params.depth}km`;
-        const scaleString = params.scale ? params.scale.replace('-', '弱').replace('+', '強') : '-';
+        const intensityString = params.intensity ? params.intensity.replace('-', '弱').replace('+', '強') : '-';
         const magnitudeString = isNaN(params.magnitude) ? '不明' : params.magnitude.toFixed(1);
 
         panel.innerHTML =
@@ -419,7 +446,7 @@ Promise.all([
             '</div>' +
             '<div class="panel-section">' +
             '<div class="panel-section-title">最大震度</div>' +
-            `<div class="panel-section-body">${scaleString}</div>` +
+            `<div class="panel-section-body">${intensityString}</div>` +
             '</div>' +
             '<div class="panel-section">' +
             '<div class="panel-section-title">マグニチュード</div>' +
@@ -455,8 +482,9 @@ Promise.all([
             map.once('moveend', () => {
                 flying = false;
                 panel.classList.remove('hidden');
+                map.setLayoutProperty('intensity', 'visibility', 'visible');
 
-                const {zoom, padding} = calculateCameraOptions(params.depth || 0, 9);
+                const {zoom, padding} = calculateCameraOptions(params.depth || 0, 8);
                 map.easeTo({pitch: 60, zoom, padding, duration: 2000});
             });
         } else {
@@ -505,11 +533,13 @@ Promise.all([
     } else {
         map.once(loaded ? 'idle' : 'load', () => {
             setHypocenter(initialParams);
-            if (!interactive) {
-                const completed = document.createElement('div');
-                completed.id = 'completed';
-                document.body.appendChild(completed);
-            }
+            updateIntensity().then(() => {
+                if (!interactive) {
+                    const completed = document.createElement('div');
+                    completed.id = 'completed';
+                    document.body.appendChild(completed);
+                }
+            });
         });
     }
 });
