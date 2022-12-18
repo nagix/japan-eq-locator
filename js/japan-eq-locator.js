@@ -287,7 +287,7 @@ Promise.all([
             Object.assign(listItem, {
                 id: quake.eid,
                 className: quake.eid === initialParams.eid ? 'menu-item active' : 'menu-item',
-                innerHTML: `<div class="menu-check"></div><div class="menu-text">${dateString} ${timeString}<br>${options.l} M${magnitudeString} ${intensityString}</div>`
+                innerHTML: `<div class="menu-check"></div><div class="menu-text">${dateString} ${timeString}<br>${options.l} M${magnitudeString} <span class="intensity-label-${options.s}">${intensityString}</span></div>`
             });
             listItem.addEventListener('click', () => {
                 const activeListItem = listElement.querySelector('.active');

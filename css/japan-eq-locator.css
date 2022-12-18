@@ -103,6 +103,60 @@ body {
 	max-height: calc(100% - 39px);
 	overflow-y: scroll;
 }
+.intensity-label-1 {
+    padding: 2px 5px 2px 5px;
+    border-radius: 10px;
+    color: #333;
+    background-color: #f2f2ff;
+}
+.intensity-label-2 {
+    padding: 2px 5px 2px 5px;
+    border-radius: 10px;
+    color: #333;
+    background-color: #00aaff;
+}
+.intensity-label-3 {
+    padding: 2px 5px 2px 5px;
+    border-radius: 10px;
+    color: #fff;
+    background-color: #0041ff;
+}
+.intensity-label-4 {
+    padding: 2px 5px 2px 5px;
+    border-radius: 10px;
+    color: #333;
+    background-color: #fae696;
+}
+.intensity-label-5- {
+    padding: 2px 5px 2px 5px;
+    border-radius: 10px;
+    color: #333;
+    background-color: #ffe600;
+}
+.intensity-label-5\+ {
+    padding: 2px 5px 2px 5px;
+    border-radius: 10px;
+    color: #333;
+    background-color: #ff9900;
+}
+.intensity-label-6- {
+    padding: 2px 5px 2px 5px;
+    border-radius: 10px;
+    color: #fff;
+    background-color: #ff2800;
+}
+.intensity-label-6\+ {
+    padding: 2px 5px 2px 5px;
+    border-radius: 10px;
+    color: #fff;
+    background-color: #a50021;
+}
+.intensity-label-7 {
+    padding: 2px 5px 2px 5px;
+    border-radius: 10px;
+    color: #fff;
+    background-color: #b40068;
+}
 .info {
 	position: absolute;
 	top: 10px;
