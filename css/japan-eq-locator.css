@@ -289,7 +289,7 @@ body {
 .panel-location-text {
 	font-size: 18px;
 	line-height: 30px;
-	white-space: nowrap;
+	white-space: normal;
 }
 .close-button {
 	position: absolute;
@@ -336,6 +336,7 @@ body {
 	.panel-location-text {
 		font-size: 32px;
 		line-height: 48px;
+		white-space: nowrap;
 	}
 	.close-button {
 		top: 10px;

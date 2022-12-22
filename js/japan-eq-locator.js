@@ -11,6 +11,19 @@ const TIME_FORMAT = {
     minute: 'numeric',
     timeZone: 'Asia/Tokyo'
 };
+const INTENSITY_LOOKUP = {
+    '震度１': '1',
+    '震度２': '2',
+    '震度３': '3',
+    '震度４': '4',
+    '震度５弱': '5-',
+    '震度５': '5',
+    '震度５強': '5+',
+    '震度６弱': '6-',
+    '震度６': '6',
+    '震度６強': '6+',
+    '震度７': '7'
+};
 
 class MapboxGLButtonControl {
 
@@ -65,12 +78,12 @@ class MapboxGLButtonControl {
 const colorScale = d3.scaleSequential([0, -500000], d3.interpolateSpectral);
 
 const options = {};
-for (const key of ['e', 'lng', 'lat', 'd', 't', 'l', 's', 'm', 'static']) {
+for (const key of ['e', 'lng', 'lat', 'd', 't', 'l', 's', 'm', 'id', 'static']) {
     const regex = new RegExp(`(?:\\?|&)${key}=(.*?)(?:&|$)`);
     const match = location.search.match(regex);
     options[key] = match ? decodeURIComponent(match[1]) : undefined;
 }
-let auto = !!(options.lng && options.lat && options.t);
+let auto = !!(options.lng && options.lat && options.t || options.id);
 const interactive = !(auto && options.static);
 const getParams = options => ({
     eid: options.e,
@@ -239,6 +252,34 @@ Promise.all([
             getRadius: 500
         })
     ),
+    options.id ? fetch(`https://api.nagi-p.com/eqdb/earthquakes/${options.id}`).then(res => res.json()).then(data => {
+        const hyp = data.hyp[0];
+        const features = data.int.map(x => ({
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [x.lon, x.lat]
+            },
+            properties: {
+                intensity: INTENSITY_LOOKUP[x.int]
+            }
+        }));
+        map.getSource('intensity').setData({
+            type: 'FeatureCollection',
+            features
+        });
+        Object.assign(initialParams, {
+            lng: +hyp.lon,
+            lat: +hyp.lat,
+            depth: +hyp.dep.replace(' km', ''),
+            time: hyp.ot.replaceAll('/', '-').replace(' ', 'T') + '+09:00',
+            location: hyp.name,
+            intensity: INTENSITY_LOOKUP[hyp.maxI],
+            magnitude: +hyp.mag
+        });
+    }).catch(err => {
+        options.id = undefined;
+    }) : Promise.resolve(),
     new Promise(resolve => {
         map.once('styledata', resolve);
         map.once('load', () => {
@@ -533,13 +574,15 @@ Promise.all([
     } else {
         map.once(loaded ? 'idle' : 'load', () => {
             setHypocenter(initialParams);
-            updateIntensity().then(() => {
-                if (!interactive) {
-                    const completed = document.createElement('div');
-                    completed.id = 'completed';
-                    document.body.appendChild(completed);
-                }
-            });
+            if (!options.id) {
+                updateIntensity().then(() => {
+                    if (!interactive) {
+                        const completed = document.createElement('div');
+                        completed.id = 'completed';
+                        document.body.appendChild(completed);
+                    }
+                });
+            }
         });
     }
 });

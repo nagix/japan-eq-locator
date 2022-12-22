@@ -26,12 +26,20 @@
   "intensity-4": {
     "width": 16,
     "height": 16,
+    "x": 48,
+    "y": 0,
+    "pixelRatio": 1,
+    "visible": true
+  },
+  "intensity-5-": {
+    "width": 16,
+    "height": 16,
     "x": 0,
     "y": 16,
     "pixelRatio": 1,
     "visible": true
   },
-  "intensity-5-": {
+  "intensity-5": {
     "width": 16,
     "height": 16,
     "x": 16,
@@ -48,6 +56,14 @@
     "visible": true
   },
   "intensity-6-": {
+    "width": 16,
+    "height": 16,
+    "x": 48,
+    "y": 16,
+    "pixelRatio": 1,
+    "visible": true
+  },
+  "intensity-6": {
     "width": 16,
     "height": 16,
     "x": 0,
