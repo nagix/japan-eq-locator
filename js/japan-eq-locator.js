@@ -24,6 +24,39 @@ const INTENSITY_LOOKUP = {
     '震度６強': '6+',
     '震度７': '7'
 };
+const HISTORICAL_EARTHQUAKES = [
+    {lng: '142.007', lat: '42.69', d: '37', t: '2018-09-06T03:07:59+09:00', l: '胆振地方中東部', s: '7', m: '6.7', id: '20180906030759', n: '北海道胆振東部地震'},
+    {lng: '130.762', lat: '32.7533', d: '12', t: '2016-04-16T01:25:05+09:00', l: '熊本県熊本地方', s: '7', m: '7.3', id: '20160416012505', n: '熊本地震'},
+    {lng: '130.808', lat: '32.7417', d: '11', t: '2016-04-14T21:26:34+09:00', l: '熊本県熊本地方', s: '7', m: '6.5', id: '20160414212634', n: '熊本地震'},
+    {lng: '142.86', lat: '38.1033', d: '24', t: '2011-03-11T14:46:18+09:00', l: '三陸沖', s: '7', m: '9.0', id: '20110311144618', n: '東北地方太平洋沖地震 (東日本大震災)'},
+    {lng: '140.88', lat: '39.0283', d: '8', t: '2008-06-14T08:43:45+09:00', l: '岩手県内陸南部', s: '6+', m: '7.2', id: '20080614084345', n: '岩手・宮城内陸地震'},
+    {lng: '138.608', lat: '37.5567', d: '17', t: '2007-07-16T10:13:22+09:00', l: '新潟県上中越沖', s: '6+', m: '6.8', id: '20070716101322', n: '新潟県中越沖地震'},
+    {lng: '136.685', lat: '37.22', d: '11', t: '2007-03-25T09:41:57+09:00', l: '能登半島沖', s: '6+', m: '6.9', id: '20070325094157', n: '能登半島地震'},
+    {lng: '138.867', lat: '37.2917', d: '13', t: '2004-10-23T17:56:00+09:00', l: '新潟県中越地方', s: '7', m: '6.8', id: '20041023175600', n: '新潟県中越地震'},
+    {lng: '144.078', lat: '41.7783', d: '45', t: '2003-09-26T04:50:07+09:00', l: '十勝沖', s: '6-', m: '8.0', id: '20030926045007', n: '十勝沖地震'},
+    {lng: '132.693', lat: '34.1317', d: '46', t: '2001-03-24T15:27:54+09:00', l: '安芸灘', s: '6-', m: '6.7', id: '20010324152754', n: '芸予地震'},
+    {lng: '133.348', lat: '35.2733', d: '9', t: '2000-10-06T13:30:17+09:00', l: '鳥取県西部', s: '6+', m: '7.3', id: '20001006133017', n: '鳥取県西部地震'},
+    {lng: '135.035', lat: '34.5983', d: '16', t: '1995-01-17T05:46:51+09:00', l: '大阪湾', s: '7', m: '7.3', id: '19950117054651', n: '兵庫県南部地震 (阪神・淡路大震災)'},
+    {lng: '143.745', lat: '40.43', d: '0', t: '1994-12-28T21:19:20+09:00', l: '三陸沖', s: '6', m: '7.6', id: '19941228211920', n: '三陸はるか沖地震'},
+    {lng: '147.673', lat: '43.375', d: '28', t: '1994-10-04T22:22:56+09:00', l: '北海道東方沖', s: '6', m: '8.2', id: '19941004222256', n: '北海道東方沖地震'},
+    {lng: '139.18', lat: '42.7817', d: '35', t: '1993-07-12T22:17:11+09:00', l: '北海道南西沖', s: '5', m: '7.8', id: '19930712221711', n: '北海道南西沖地震'},
+    {lng: '144.353', lat: '42.92', d: '101', t: '1993-01-15T20:06:07+09:00', l: '釧路沖', s: '6', m: '7.5', id: '19930115200607', n: '釧路沖地震'},
+    {lng: '137.557', lat: '35.825', d: '2', t: '1984-09-14T08:48:49+09:00', l: '長野県南部', s: '4', m: '6.8', id: '19840914084849', n: '長野県西部地震'},
+    {lng: '139.073', lat: '40.36', d: '14', t: '1983-05-26T11:59:57+09:00', l: '秋田県沖', s: '5', m: '7.7', id: '19830526115957', n: '日本海中部地震'},
+    {lng: '142.6', lat: '42.0667', d: '40', t: '1982-03-21T11:32:05+09:00', l: '浦河沖', s: '6', m: '7.1', id: '19820321113205', n: '浦河沖地震'},
+    {lng: '142.167', lat: '38.15', d: '40', t: '1978-06-12T17:14:25+09:00', l: '宮城県沖', s: '5', m: '7.4', id: '19780612171425', n: '宮城県沖地震'},
+    {lng: '139.25', lat: '34.7667', d: '0', t: '1978-01-14T12:24:38+09:00', l: '伊豆大島近海', s: '5', m: '7.0', id: '19780114122438', n: '伊豆大島近海の地震'},
+    {lng: '138.78', lat: '34.63', d: '9', t: '1974-05-09T08:33:27+09:00', l: '駿河湾', s: '5', m: '6.9', id: '19740509083327', n: '伊豆半島沖地震'},
+    {lng: '145.97', lat: '43.0583', d: '44', t: '1973-06-17T12:55:02+09:00', l: '根室半島南東沖', s: '5', m: '7.4', id: '19730617125502', n: '根室半島沖地震'},
+    {lng: '140.938', lat: '33.3367', d: '54', t: '1972-12-04T19:16:10+09:00', l: '八丈島東方沖', s: '6', m: '7.2', id: '19721204191610', n: '八丈島東方沖地震'},
+    {lng: '143.595', lat: '40.6983', d: '0', t: '1968-05-16T09:48:54+09:00', l: '青森県東方沖', s: '5', m: '7.9', id: '19680516094854', n: '十勝沖地震'},
+    {lng: '132.437', lat: '32.4483', d: '22', t: '1968-04-01T09:42:04+09:00', l: '日向灘', s: '5', m: '7.5', id: '19680401094204', n: '日向灘地震'},
+    {lng: '130.755', lat: '32.0333', d: '0', t: '1968-02-21T10:44:52+09:00', l: '宮崎県南部山沿い', s: '5', m: '6.1', id: '19680221104452', n: 'えびの地震'},
+    {lng: '139.212', lat: '38.37', d: '34', t: '1964-06-16T13:01:40+09:00', l: '新潟県下越沖', s: '5', m: '7.5', id: '19640616130140', n: '新潟地震'},
+    {lng: '135.792', lat: '35.815', d: '14', t: '1963-03-27T06:34:39+09:00', l: '若狭湾', s: '5', m: '6.9', id: '19630327063439', n: '越前岬沖地震'},
+    {lng: '141.138', lat: '38.74', d: '19', t: '1962-04-30T11:26:24+09:00', l: '宮城県北部', s: '4', m: '6.5', id: '19620430112624', n: '宮城県北部地震'},
+    {lng: '136.7', lat: '36.1117', d: '10', t: '1961-08-19T14:33:33+09:00', l: '石川県加賀地方', s: '4', m: '7.0', id: '19610819143333', n: '北美濃地震'}
+]
 
 class MapboxGLButtonControl {
 
@@ -93,7 +126,8 @@ const getParams = options => ({
     time: options.t,
     location: options.l,
     intensity: options.s,
-    magnitude: isNaN(options.m) ? undefined : +options.m
+    magnitude: isNaN(options.m) ? undefined : +options.m,
+    id: options.id
 });
 const initialParams = getParams(options);
 const params = {};
@@ -136,17 +170,26 @@ if (!interactive) {
 let loaded = false;
 
 const canvasElement = document.querySelector('#map .mapboxgl-canvas');
-const listBGElement = document.getElementById('list-bg');
+const recentListElement = document.querySelector('#recent-list>div:last-child');
+const recentListBGElement = document.getElementById('recent-list-bg');
+const historicalListElement = document.querySelector('#historical-list>div:last-child');
+const historicalListBGElement = document.getElementById('historical-list-bg');
 const infoBGElement = document.getElementById('info-bg');
 
 if (interactive) {
     map.addControl(new mapboxgl.NavigationControl({visualizePitch: true}));
     map.addControl(new mapboxgl.FullscreenControl());
     map.addControl(new MapboxGLButtonControl([{
-        className: 'mapboxgl-ctrl-list',
+        className: 'mapboxgl-ctrl-recent-list',
         title: 'Recent earthquakes',
         eventHandler() {
-            listBGElement.style.display = 'block';
+            recentListBGElement.style.display = 'block';
+        }
+    }, {
+        className: 'mapboxgl-ctrl-historical-list',
+        title: 'Historical earthquakes',
+        eventHandler() {
+            historicalListBGElement.style.display = 'block';
         }
     }, {
         className: 'mapboxgl-ctrl-twitter',
@@ -162,8 +205,12 @@ if (interactive) {
         }
     }]));
 
-    listBGElement.addEventListener('click', () => {
-        listBGElement.style.display = 'none';
+    recentListBGElement.addEventListener('click', () => {
+        recentListBGElement.style.display = 'none';
+        canvasElement.focus();
+    });
+    historicalListBGElement.addEventListener('click', () => {
+        historicalListBGElement.style.display = 'none';
         canvasElement.focus();
     });
     infoBGElement.addEventListener('click', () => {
@@ -252,22 +299,8 @@ Promise.all([
             getRadius: 500
         })
     ),
-    options.id ? fetch(`https://api.nagi-p.com/eqdb/earthquakes/${options.id}`).then(res => res.json()).then(data => {
+    initialParams.id ? fetch(`https://api.nagi-p.com/eqdb/earthquakes/${initialParams.id}`).then(res => res.json()).then(data => {
         const hyp = data.hyp[0];
-        const features = data.int.map(x => ({
-            type: 'Feature',
-            geometry: {
-                type: 'Point',
-                coordinates: [x.lon, x.lat]
-            },
-            properties: {
-                intensity: INTENSITY_LOOKUP[x.int]
-            }
-        }));
-        map.getSource('intensity').setData({
-            type: 'FeatureCollection',
-            features
-        });
         Object.assign(initialParams, {
             lng: +hyp.lon,
             lat: +hyp.lat,
@@ -278,7 +311,7 @@ Promise.all([
             magnitude: +hyp.mag
         });
     }).catch(err => {
-        options.id = undefined;
+        initialParams.id = undefined;
     }) : Promise.resolve(),
     new Promise(resolve => {
         map.once('styledata', resolve);
@@ -292,8 +325,7 @@ Promise.all([
     // Workaround for deck.gl #3522
     map.__deck.props.getCursor = () => map.getCanvas().style.cursor;
 
-    const listElement = document.querySelector('#list>div:last-child');
-    if (listElement) {
+    if (recentListElement) {
         for (const quake of quakes) {
             if (quake.ttl !== '震源・震度情報' && quake.ttl !== '遠地地震に関する情報') {
                 continue;
@@ -331,7 +363,7 @@ Promise.all([
                 innerHTML: `<div class="menu-check"></div><div class="menu-text">${dateString} ${timeString}<br>${options.l} M${magnitudeString} <span class="intensity-label-${options.s}">${intensityString}</span></div>`
             });
             listItem.addEventListener('click', () => {
-                const activeListItem = listElement.querySelector('.active');
+                const activeListItem = mapElement.querySelector('.menu-item.active');
                 if (activeListItem) {
                     if (activeListItem === listItem) {
                         return;
@@ -345,8 +377,35 @@ Promise.all([
                 setHypocenter(getParams(options));
                 updateIntensity();
             });
-            listElement.appendChild(listItem);
+            recentListElement.appendChild(listItem);
         }
+    }
+
+    for (const item of HISTORICAL_EARTHQUAKES) {
+        const dateString = new Date(item.t).toLocaleDateString('ja-JP', DATE_FORMAT);
+        const timeString = new Date(item.t).toLocaleTimeString('ja-JP', TIME_FORMAT);
+        const intensityString = item.s ? '震度' + item.s.replace('-', '弱').replace('+', '強') : '';
+
+        const listItem = document.createElement('div');
+        Object.assign(listItem, {
+            id: item.id,
+            className: item.id === options.id ? 'menu-item active' : 'menu-item',
+            innerHTML: `<div class="menu-check"></div><div class="menu-text">${dateString} ${timeString}<br>${item.l} M${item.m} <span class="intensity-label-${item.s}">${intensityString}</span><br><span class="earthquake-name">${item.n}</span></div>`
+        });
+        listItem.addEventListener('click', () => {
+            const activeListItem = mapElement.querySelector('.menu-item.active');
+            if (activeListItem) {
+                if (activeListItem === listItem) {
+                    return;
+                }
+                activeListItem.classList.remove('active');
+            }
+            listItem.classList.add('active');
+            history.pushState({}, '', location.href.replace(/\?.*/, '') + `?id=${item.id}`);
+            setHypocenter(getParams(item));
+            updateIntensity();
+        });
+        historicalListElement.appendChild(listItem);
     }
 
     const updateMarker = info => {
@@ -408,25 +467,42 @@ Promise.all([
 
     const updateIntensity = () => {
         const quake = eids[params.eid];
-        if (!quake) {
-            return Promise.resolve();
-        }
-        return fetch(`https://www.jma.go.jp/bosai/quake/data/${quake.json}`).then(res => res.json()).then(data => {
-            const features = data.Body.Intensity ? [].concat(...data.Body.Intensity.Observation.Pref.map(x => [].concat(...x.Area.map(x => [].concat(...x.City.map(x => x.IntensityStation.map(x => ({
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [x.latlon.lon, x.latlon.lat]
-                },
-                properties: {
-                    intensity: x.Int
-                }
-            })))))))) : [];
-            map.getSource('intensity').setData({
-                type: 'FeatureCollection',
-                features
+        if (quake) {
+            return fetch(`https://www.jma.go.jp/bosai/quake/data/${quake.json}`).then(res => res.json()).then(data => {
+                const features = data.Body.Intensity ? [].concat(...data.Body.Intensity.Observation.Pref.map(x => [].concat(...x.Area.map(x => [].concat(...x.City.map(x => x.IntensityStation.map(x => ({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [x.latlon.lon, x.latlon.lat]
+                    },
+                    properties: {
+                        intensity: x.Int
+                    }
+                })))))))) : [];
+                map.getSource('intensity').setData({
+                    type: 'FeatureCollection',
+                    features
+                });
             });
-        });
+        } else if (params.id) {
+            return fetch(`https://api.nagi-p.com/eqdb/earthquakes/${params.id}`).then(res => res.json()).then(data => {
+                const features = data.int.map(x => ({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [x.lon, x.lat]
+                    },
+                    properties: {
+                        intensity: INTENSITY_LOOKUP[x.int]
+                    }
+                }));
+                map.getSource('intensity').setData({
+                    type: 'FeatureCollection',
+                    features
+                });
+            });
+        }
+        return Promise.resolve();
     };
 
     const onHover = info => {
@@ -502,7 +578,7 @@ Promise.all([
                 className: 'close-button'
             });
             closeButton.addEventListener('click', () => {
-                const activeListItem = listElement.querySelector('.active');
+                const activeListItem = mapElement.querySelector('.menu-item.active');
                 if (activeListItem) {
                     activeListItem.classList.remove('active');
                 }
@@ -574,15 +650,13 @@ Promise.all([
     } else {
         map.once(loaded ? 'idle' : 'load', () => {
             setHypocenter(initialParams);
-            if (!options.id) {
-                updateIntensity().then(() => {
-                    if (!interactive) {
-                        const completed = document.createElement('div');
-                        completed.id = 'completed';
-                        document.body.appendChild(completed);
-                    }
-                });
-            }
+            updateIntensity().then(() => {
+                if (!interactive) {
+                    const completed = document.createElement('div');
+                    completed.id = 'completed';
+                    document.body.appendChild(completed);
+                }
+            });
         });
     }
 });
