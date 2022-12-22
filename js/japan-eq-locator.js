@@ -483,6 +483,7 @@ Promise.all([
                     type: 'FeatureCollection',
                     features
                 });
+                return new Promise(resolve => map.once('idle', resolve));
             });
         } else if (params.id) {
             return fetch(`https://api.nagi-p.com/eqdb/earthquakes/${params.id}`).then(res => res.json()).then(data => {
@@ -500,6 +501,7 @@ Promise.all([
                     type: 'FeatureCollection',
                     features
                 });
+                return new Promise(resolve => map.once('idle', resolve));
             });
         }
         return Promise.resolve();
