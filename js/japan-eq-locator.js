@@ -476,6 +476,7 @@ Promise.all([
                         coordinates: [x.latlon.lon, x.latlon.lat]
                     },
                     properties: {
+                        location: x.Name,
                         intensity: x.Int
                     }
                 })))))))) : [];
@@ -494,6 +495,7 @@ Promise.all([
                         coordinates: [x.lon, x.lat]
                     },
                     properties: {
+                        location: x.name,
                         intensity: INTENSITY_LOOKUP[x.int]
                     }
                 }));
@@ -626,6 +628,17 @@ Promise.all([
             } else if (!flying) {
                 updateMarker();
             }
+        });
+
+        map.on('mousemove', 'intensity', e => {
+            tooltip.style.left = e.point.x + 4 + 'px';
+            tooltip.style.top = e.point.y + 4 + 'px';
+            tooltip.innerHTML = e.features[0].properties.location.replace(/＊$/, '');
+            tooltip.classList.remove('hidden');
+        });
+
+        map.on('mouseleave', 'intensity', () => {
+            tooltip.classList.add('hidden');
         });
 
         map.on('resize', () => {
