@@ -16,7 +16,8 @@
       "data": {
         "type": "FeatureCollection",
         "features": []
-      }
+      },
+      "generateId": true
     }
   },
   "sprite": "https://nagix.github.io/japan-eq-locator/data/intensity",
@@ -1874,6 +1875,12 @@
           ["get", "intensity"],
           ["literal", ["1", "2", "3", "4", "5-", "5", "5+", "6-", "6", "6+", "7"]]
         ]
+      },
+      "paint": {
+        "icon-opacity": ["min", ["max", ["/", ["-",
+          ["coalesce", ["feature-state", "elapsed"], 1e9],
+          ["get", "delay"]
+        ], 500], 0], 1]
       }
     }
   ],

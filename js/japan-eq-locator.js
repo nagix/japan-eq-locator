@@ -56,7 +56,7 @@ const HISTORICAL_EARTHQUAKES = [
     {lng: '135.792', lat: '35.815', d: '14', t: '1963-03-27T06:34:39+09:00', l: '若狭湾', s: '5', m: '6.9', id: '19630327063439', n: '越前岬沖地震'},
     {lng: '141.138', lat: '38.74', d: '19', t: '1962-04-30T11:26:24+09:00', l: '宮城県北部', s: '4', m: '6.5', id: '19620430112624', n: '宮城県北部地震'},
     {lng: '136.7', lat: '36.1117', d: '10', t: '1961-08-19T14:33:33+09:00', l: '石川県加賀地方', s: '4', m: '7.0', id: '19610819143333', n: '北美濃地震'}
-]
+];
 
 class MapboxGLButtonControl {
 
@@ -133,6 +133,8 @@ const initialParams = getParams(options);
 const params = {};
 const eids = {};
 let flying = false;
+let numIntensity = 0;
+let maxDelay = 0;
 
 const mapElement = document.getElementById('map');
 
@@ -289,7 +291,6 @@ Promise.all([
             pickable: true,
             opacity: 0.2,
             radiusMinPixels: 1,
-        //            radiusMaxPixels: 1,
             billboard: true,
             antialiasing: false,
             getFillColor: d => {
@@ -339,7 +340,7 @@ Promise.all([
             options.lng = +matches[2];
             options.lat = +matches[1];
             if (matches[3] !== '') {
-                options.d = Math.abs(+matches[3] / 1000)
+                options.d = Math.abs(+matches[3] / 1000);
             }
             options.l = quake.anm;
             options.t = quake.at;
@@ -466,44 +467,59 @@ Promise.all([
     };
 
     const updateIntensity = () => {
-        const quake = eids[params.eid];
-        if (quake) {
-            return fetch(`https://www.jma.go.jp/bosai/quake/data/${quake.json}`).then(res => res.json()).then(data => {
-                const features = data.Body.Intensity ? [].concat(...data.Body.Intensity.Observation.Pref.map(x => [].concat(...x.Area.map(x => [].concat(...x.City.map(x => x.IntensityStation.map(x => ({
+        const _updateIntensity = prop => {
+            return fetch(prop.url).then(res => res.json()).then(data => {
+                let minDistance = Infinity;
+                let maxDistance = 0;
+                const features = prop.getList(data).map(x => {
+                    const coord = prop.getCoord(x);
+                    const distance = Math.sqrt(Math.pow(turf.distance(coord, [params.lng, params.lat]), 2) + Math.pow(params.depth || 0, 2));
+                    minDistance = Math.min(minDistance, distance);
+                    maxDistance = Math.max(maxDistance, distance);
+                    return {
+                        coord,
+                        location: prop.getLocation(x),
+                        intensity: prop.getIntensity(x),
+                        distance
+                    };
+                }).map(({coord, location, intensity, distance}) => ({
                     type: 'Feature',
                     geometry: {
                         type: 'Point',
-                        coordinates: [x.latlon.lon, x.latlon.lat]
+                        coordinates: coord
                     },
                     properties: {
-                        location: x.Name,
-                        intensity: x.Int
-                    }
-                })))))))) : [];
-                map.getSource('intensity').setData({
-                    type: 'FeatureCollection',
-                    features
-                });
-                return new Promise(resolve => map.once('idle', resolve));
-            });
-        } else if (params.id) {
-            return fetch(`https://api.nagi-p.com/eqdb/earthquakes/${params.id}`).then(res => res.json()).then(data => {
-                const features = data.int.map(x => ({
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [x.lon, x.lat]
-                    },
-                    properties: {
-                        location: x.name,
-                        intensity: INTENSITY_LOOKUP[x.int]
+                        location,
+                        intensity,
+                        delay: (distance - minDistance) * 20
                     }
                 }));
                 map.getSource('intensity').setData({
                     type: 'FeatureCollection',
                     features
                 });
+                numIntensity = features.length;
+                maxDelay = (maxDistance - minDistance) * 20 + 500;
                 return new Promise(resolve => map.once('idle', resolve));
+            });
+        };
+
+        const quake = eids[params.eid];
+        if (quake) {
+            return _updateIntensity({
+                url: `https://www.jma.go.jp/bosai/quake/data/${quake.json}`,
+                getList: d => d.Body.Intensity ? [].concat(...d.Body.Intensity.Observation.Pref.map(x => [].concat(...x.Area.map(x => [].concat(...x.City.map(x => x.IntensityStation)))))) : [],
+                getCoord: d => [d.latlon.lon, d.latlon.lat],
+                getLocation: d => d.Name,
+                getIntensity: d => d.Int
+            });
+        } else if (params.id) {
+            return _updateIntensity({
+                url: `https://api.nagi-p.com/eqdb/earthquakes/${params.id}`,
+                getList: d => d.int,
+                getCoord: d => [d.lon, d.lat],
+                getLocation: d => d.name,
+                getIntensity: d => INTENSITY_LOOKUP[d.int]
             });
         }
         return Promise.resolve();
@@ -520,11 +536,42 @@ Promise.all([
         }
     };
 
+    const setElapsedTime = t => {
+        const feature = {source: 'intensity'};
+        const state = {elapsed: t};
+        for (let i = 0; i < numIntensity; i++) {
+            feature.id = i;
+            map.setFeatureState(feature, state);
+        }
+    }
+
+    const setFinalView = () => {
+        flying = false;
+        panel.classList.remove('hidden');
+
+        setElapsedTime(0);
+        map.setLayoutProperty('intensity', 'visibility', 'visible');
+
+        let start;
+        const repeat = now => {
+            const elapsed = Math.min(now - (start = start || now), maxDelay);
+            setElapsedTime(elapsed);
+            if (elapsed < maxDelay && map.getLayoutProperty('intensity', 'visibility') === 'visible') {
+                requestAnimationFrame(repeat);
+            }
+        };
+        requestAnimationFrame(repeat);
+
+        const {zoom, padding} = calculateCameraOptions(params.depth || 0, 8);
+        map.easeTo({pitch: 60, zoom, padding, duration: 2000});
+    };
+
     const setHypocenter = _params => {
         if (interactive) {
             hideMarker();
             panel.classList.add('hidden');
             map.setLayoutProperty('intensity', 'visibility', 'none');
+            map.off('moveend', setFinalView);
         }
         auto = !!(_params && _params.lng && _params.lat && _params.time);
         if (!auto) {
@@ -600,18 +647,11 @@ Promise.all([
                 speed: 0.3
             });
             flying = true;
-            map.once('moveend', () => {
-                flying = false;
-                panel.classList.remove('hidden');
-                map.setLayoutProperty('intensity', 'visibility', 'visible');
-
-                const {zoom, padding} = calculateCameraOptions(params.depth || 0, 8);
-                map.easeTo({pitch: 60, zoom, padding, duration: 2000});
-            });
+            map.once('moveend', setFinalView);
         } else {
             updateMarker();
             updateWave(750);
-        }   
+        }
     };
 
     let mobile = isMobile();
