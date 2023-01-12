@@ -163,6 +163,7 @@ const map = new mapboxgl.Map({
     style: 'data/style.json',
     center: interactive ? auto ? [137.25, 36.5] : [139.7670, 35.6814] : [initialParams.lng, initialParams.lat],
     zoom: interactive ? auto ? 4 : 7 : zoom,
+    minZoom: 2,
     pitch: interactive && auto ? 0 : 60,
     interactive
 });
@@ -546,44 +547,6 @@ Promise.all([
     }
 
     const setFinalView = () => {
-        flying = false;
-        panel.classList.remove('hidden');
-
-        setElapsedTime(0);
-        map.setLayoutProperty('intensity', 'visibility', 'visible');
-
-        let start;
-        const repeat = now => {
-            const elapsed = Math.min(now - (start = start || now), maxDelay);
-            setElapsedTime(elapsed);
-            if (elapsed < maxDelay && map.getLayoutProperty('intensity', 'visibility') === 'visible') {
-                requestAnimationFrame(repeat);
-            }
-        };
-        requestAnimationFrame(repeat);
-
-        const {zoom, padding} = calculateCameraOptions(params.depth || 0, 8);
-        map.easeTo({pitch: 60, zoom, padding, duration: 2000});
-    };
-
-    const setHypocenter = _params => {
-        if (interactive) {
-            hideMarker();
-            panel.classList.add('hidden');
-            map.setLayoutProperty('intensity', 'visibility', 'none');
-            map.off('moveend', setFinalView);
-        }
-        auto = !!(_params && _params.lng && _params.lat && _params.time);
-        if (!auto) {
-            map.easeTo({
-                padding: {top: 0, bottom: 0, left: 0, right: 0},
-                duration: 1000
-            });
-            hypocenterLayer.setProps({onHover});
-            return;
-        }
-        Object.assign(params, _params);
-
         const dateString = new Date(params.time).toLocaleDateString('ja-JP', DATE_FORMAT);
         const timeString = new Date(params.time).toLocaleTimeString('ja-JP', TIME_FORMAT);
         const depthString = isNaN(params.depth) ? '不明' : params.depth === 0 ? 'ごく浅い' : `${params.depth}km`;
@@ -637,7 +600,49 @@ Promise.all([
                 canvasElement.focus();
             });
             panel.appendChild(closeButton);
+        }
 
+        flying = false;
+        panel.classList.remove('hidden');
+
+        if (interactive) {
+            setElapsedTime(0);
+            map.setLayoutProperty('intensity', 'visibility', 'visible');
+
+            let start;
+            const repeat = now => {
+                const elapsed = Math.min(now - (start = start || now), maxDelay);
+                setElapsedTime(elapsed);
+                if (elapsed < maxDelay && map.getLayoutProperty('intensity', 'visibility') === 'visible') {
+                    requestAnimationFrame(repeat);
+                }
+            };
+            requestAnimationFrame(repeat);
+
+            const {zoom, padding} = calculateCameraOptions(params.depth || 0, 8);
+            map.easeTo({pitch: 60, zoom, padding, duration: 2000});
+        }
+    };
+
+    const setHypocenter = _params => {
+        if (interactive) {
+            hideMarker();
+            panel.classList.add('hidden');
+            map.setLayoutProperty('intensity', 'visibility', 'none');
+            map.off('moveend', setFinalView);
+        }
+        auto = !!(_params && _params.lng && _params.lat && _params.time);
+        if (!auto) {
+            map.easeTo({
+                padding: {top: 0, bottom: 0, left: 0, right: 0},
+                duration: 1000
+            });
+            hypocenterLayer.setProps({onHover});
+            return;
+        }
+        Object.assign(params, _params);
+
+        if (interactive) {
             hypocenterLayer.setProps({onHover: null});
             map.flyTo({
                 center: [params.lng, params.lat],
@@ -649,6 +654,7 @@ Promise.all([
             flying = true;
             map.once('moveend', setFinalView);
         } else {
+            setFinalView();
             updateMarker();
             updateWave(750);
         }
