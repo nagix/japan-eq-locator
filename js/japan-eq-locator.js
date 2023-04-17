@@ -283,7 +283,7 @@ Object.assign(panel, {
 mapElement.appendChild(panel);
 
 Promise.all([
-    fetch('https://www.jma.go.jp/bosai/quake/data/list.json').then(res => res.json()),
+    fetch('https://www.jma.go.jp/bosai/quake/data/list.json' + (interactive ? '' : `?t=${Date.now()}`)).then(res => res.json()),
     fetch('data/hypocenters.json').then(res => res.json()).then(data =>
         new deck.MapboxLayer({
             id: 'hypocenters',
