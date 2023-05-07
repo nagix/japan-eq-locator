@@ -138,9 +138,7 @@ let maxDelay = 0;
 
 const mapElement = document.getElementById('map');
 
-const isMobile = () => {
-    return mapElement.clientWidth < 640;
-};
+const isMobile = () => mapElement.clientWidth < 640;
 const calculateCameraOptions = (depth, maxZoom) => {
     const mobile = isMobile();
     const height = mapElement.clientHeight;
@@ -282,6 +280,10 @@ Object.assign(panel, {
 });
 mapElement.appendChild(panel);
 
+map.once('load', () => {
+    loaded = true;
+});
+
 Promise.all([
     fetch('https://www.jma.go.jp/bosai/quake/data/list.json' + (interactive ? '' : `?t=${Date.now()}`)).then(res => res.json()),
     fetch('data/hypocenters.json').then(res => res.json()).then(data =>
@@ -315,12 +317,7 @@ Promise.all([
     }).catch(err => {
         initialParams.id = undefined;
     }) : Promise.resolve(),
-    new Promise(resolve => {
-        map.once('styledata', resolve);
-        map.once('load', () => {
-            loaded = true;
-        });
-    })
+    new Promise(resolve => map.once('styledata', resolve))
 ]).then(([quakes, hypocenterLayer]) => {
     map.addLayer(hypocenterLayer, 'waterway');
 
@@ -468,8 +465,8 @@ Promise.all([
     };
 
     const updateIntensity = () => {
-        const _updateIntensity = prop => {
-            return fetch(prop.url).then(res => res.json()).then(data => {
+        const _updateIntensity = prop =>
+            fetch(prop.url).then(res => res.json()).then(data => {
                 let minDistance = Infinity;
                 let maxDistance = 0;
                 const features = prop.getList(data).map(x => {
@@ -503,7 +500,6 @@ Promise.all([
                 maxDelay = (maxDistance - minDistance) * 20 + 500;
                 return new Promise(resolve => map.once('idle', resolve));
             });
-        };
 
         const quake = eids[params.eid];
         if (quake) {
