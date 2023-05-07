@@ -704,8 +704,12 @@ Promise.all([
 
     if (!auto) {
         hypocenterLayer.setProps({onHover});
+        map.once(loaded ? 'idle' : 'load', () => {
+            document.getElementById('loader').style.display = 'none';
+        });
     } else {
         map.once(loaded ? 'idle' : 'load', () => {
+            document.getElementById('loader').style.display = 'none';
             setHypocenter(initialParams);
             updateIntensity().then(() => {
                 if (!interactive) {
