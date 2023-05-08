@@ -687,7 +687,7 @@ Promise.all([
             if (!auto) {
                 hideMarker();
             } else if (!flying && mobile !== isMobile()) {
-                const {zoom, padding} = calculateCameraOptions(params.depth || 0, 9);
+                const {zoom, padding} = calculateCameraOptions(params.depth || 0, 8);
                 map.easeTo({zoom, padding, duration: 1000});
                 mobile = !mobile;
             }
