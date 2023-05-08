@@ -160,9 +160,9 @@ const map = new mapboxgl.Map({
     container: 'map',
     style: 'data/style.json',
     center: interactive ? auto ? [137.25, 36.5] : [139.7670, 35.6814] : [initialParams.lng, initialParams.lat],
-    zoom: interactive ? auto ? 4 : 7 : zoom,
+    zoom: interactive ? auto ? 4 : 7 : initialParams.intensity ? zoom : 2,
     minZoom: 2,
-    pitch: interactive && auto ? 0 : 60,
+    pitch: (interactive && auto) || (!interactive && !initialParams.intensity) ? 0 : 60,
     interactive
 });
 if (!interactive) {
