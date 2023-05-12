@@ -153,7 +153,7 @@ const calculateCameraOptions = (depth, maxZoom) => {
             {top: 0, bottom: padding, left: 310, right: 0}
     };
 };
-const {zoom, padding} = calculateCameraOptions(initialParams.depth || 0, 7);
+const {zoom, padding} = calculateCameraOptions(initialParams.intensity && initialParams.depth || 0, 7);
 
 const map = new mapboxgl.Map({
     accessToken: 'pk.eyJ1IjoibmFnaXgiLCJhIjoiY2xhcDc4MXYyMGZxOTN5bWt4NHU4azJlbCJ9.BvJ83DIBKKtMgTsDHTZekw',
