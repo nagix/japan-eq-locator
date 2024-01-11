@@ -1,8 +1,8 @@
 # Japan EQ Locator
 
-A 3D hypocenter map of earthquakes around Japan. Based on hypocenter data from the Japan Meteorological Agency, approximately 600,000 earthquakes of magnitude 2 or greater since 2000 are displayed.
+A 3D hypocenter map of earthquakes around Japan. Based on hypocenter data from the Japan Meteorological Agency, approximately 660,000 earthquakes of magnitude 2 or greater since 2000 are displayed.
 
-日本周辺の地震の3D震源マップ。気象庁の震源データを元に、2000年以降のマグニチュード2以上の地震約60万件を表示。
+日本周辺の地震の3D震源マップ。気象庁の震源データを元に、2000年以降のマグニチュード2以上の地震約66万件を表示。
 
 ![Screenshot](https://nagix.github.io/japan-eq-locator/screenshot1.jpg)
 
