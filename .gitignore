@@ -1,4 +1,4 @@
-data/h*
+data/h[0-9]*
 css/*.svg
 js/loader.js
 .DS_Store

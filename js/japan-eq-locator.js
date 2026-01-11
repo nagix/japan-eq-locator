@@ -285,25 +285,35 @@ map.once('load', () => {
     loaded = true;
 });
 
+let hypocenters;
+
 Promise.all([
     fetch('https://www.jma.go.jp/bosai/quake/data/list.json' + (interactive ? '' : `?t=${Date.now()}`)).then(res => res.json()),
-    fetch('data/hypocenters.json').then(res => res.json()).then(data =>
-        new deck.MapboxLayer({
+    fetch('data/hypocenters.dat').then(res => res.arrayBuffer()).then(buffer => {
+        hypocenters = new Float32Array(buffer);
+        const colors = new Float32Array(hypocenters.length);
+        for (let i = 0; i < hypocenters.length; i += 3) {
+            const [rgb, r, g, b] = colorScale(hypocenters[i + 2]).match(/(\d+), (\d+), (\d+)/);
+            colors.set([+r / 255, +g / 255, +b / 255], i);
+        }
+        return new deck.MapboxLayer({
             id: 'hypocenters',
             type: deck.ScatterplotLayer,
-            data,
+            data: {
+                length: hypocenters.length / 3,
+                attributes: {
+                    getPosition: {value: hypocenters, size: 3},
+                    getFillColor: {value: colors, size: 3}
+                }
+            },
             pickable: true,
             opacity: 0.2,
             radiusMinPixels: 1,
             billboard: true,
             antialiasing: false,
-            getFillColor: d => {
-                const [rgb, r, g, b] = colorScale(d.position[2]).match(/(\d+), (\d+), (\d+)/);
-                return [+r, +g, +b];
-            },
             getRadius: 500
-        })
-    ),
+        });
+    }),
     initialParams.id ? fetch(`https://api.nagi-p.com/eqdb/earthquakes/${initialParams.id}`).then(res => res.json()).then(data => {
         const hyp = data.hyp[0];
         Object.assign(initialParams, {
@@ -412,11 +422,11 @@ Promise.all([
         const viewport = map.__deck.getViewports()[0];
         const [ex, ey] = auto ?
             viewport.project([params.lng, params.lat]) :
-            info.viewport.project(info.object.position.slice(0, 2));
+            info.viewport.project([hypocenters[info.index * 3], hypocenters[info.index * 3 + 1]]);
         const [hx, hy] = auto ?
             viewport.project([params.lng, params.lat, -(params.depth || 0) * 1000]) :
             [info.x, info.y];
-        const depth = auto ? -(params.depth || 0) * 1000 : info.object.position[2];
+        const depth = auto ? -(params.depth || 0) * 1000 : hypocenters[info.index * 3 + 2];
 
         wave1.setAttributeNS(null, 'cx', hx);
         wave1.setAttributeNS(null, 'cy', hy);
@@ -525,7 +535,7 @@ Promise.all([
 
     const onHover = info => {
         if (info.layer && info.layer.id === 'hypocenters') {
-            if (info.object) {
+            if (info.picked) {
                 updateMarker(info);
             } else {
                 hideMarker();
